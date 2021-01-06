@@ -34,6 +34,7 @@ public:
     int setupIptablesHooks(void);
     int resetChains(void);
 
+    int setGlobalCleartextPenalty(StrictPenalty);
     int setUidCleartextPenalty(uid_t, StrictPenalty);
 
     static const char* LOCAL_OUTPUT;

@@ -1336,4 +1336,13 @@ interface INetd {
     */
     void bandwidthRemoveRestrictAppOnInterface(in @utf8InCpp String usecase,
             in @utf8InCpp String ifName, int uid);
+
+    /**
+    * Offers to detect sockets sending data not wrapped inside a layer of SSL/TLS encryption.
+    *
+    * @param policyPenalty The penalty policy for all apps
+    * @throws ServiceSpecificException in case of failure, with an error code indicating the
+    *         cause of the failure.
+    */
+    void strictGlobalCleartextPenalty(int policyPenalty);
 }

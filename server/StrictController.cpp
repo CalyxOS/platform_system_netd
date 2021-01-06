@@ -156,6 +156,41 @@ int StrictController::resetChains(void) {
 #undef CLEAR_CHAIN
 }
 
+int StrictController::setGlobalCleartextPenalty(StrictPenalty penalty) {
+    std::vector<std::string> commands;
+    if (penalty == ACCEPT) {
+        commands = {
+            "*filter",
+            StringPrintf("-D %s -j %s",
+                         LOCAL_OUTPUT, LOCAL_CLEAR_DETECT),
+            StringPrintf("-F %s", LOCAL_CLEAR_CAUGHT),
+        };
+    } else {
+        commands.push_back("*filter");
+        commands.push_back(StringPrintf(":%s -", LOCAL_CLEAR_CAUGHT));
+        commands.push_back(StringPrintf("-I %s -j %s",
+                                        LOCAL_OUTPUT, LOCAL_CLEAR_DETECT));
+        // DNS is cleartext. The first DNS query must be allowed through for a Private DNS (DoT)
+        // configuration. This penalty is meant to be used in conjunction with Private DNS and,
+        // when set, the system will not send cleartext DNS traffic.
+        // TODO: replace this with a more restrictive rule
+        // 1) Only allow DNS queries to the DNS server, or
+        // 2) Only allow DNS query for the DoT server hostname, using u32 matching
+        commands.push_back(StringPrintf("-I %s -p udp -m owner --uid-owner 0 --dport 53 -j ACCEPT",
+                                        LOCAL_CLEAR_CAUGHT));
+
+        if (penalty == LOG) {
+            commands.push_back(StringPrintf("-A %s -j %s", LOCAL_CLEAR_CAUGHT, LOCAL_PENALTY_LOG));
+        } else if (penalty == REJECT) {
+            commands.push_back(StringPrintf("-A %s -j %s", LOCAL_CLEAR_CAUGHT,
+                                            LOCAL_PENALTY_REJECT));
+        }
+    }
+    commands.push_back("COMMIT\n");
+
+    return (execIptablesRestore(V4V6, Join(commands, "\n")) == 0) ? 0 : -EREMOTEIO;
+}
+
 int StrictController::setUidCleartextPenalty(uid_t uid, StrictPenalty penalty) {
     // When a penalty is set, we don't know what penalty the UID previously had. In order to be able
     // to clear the previous penalty without causing an iptables error by deleting rules that don't

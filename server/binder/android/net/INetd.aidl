@@ -1377,4 +1377,22 @@ interface INetd {
      *         unix errno.
      */
     void networkRemoveUidRangesParcel(in NativeUidRangeConfig uidRangesConfig);
+
+    /**
+    * Offers to detect sockets sending data not wrapped inside a layer of SSL/TLS encryption.
+    *
+    * @param policyPenalty The penalty policy for all apps
+    * @throws ServiceSpecificException in case of failure, with an error code indicating the
+    *         cause of the failure.
+    */
+    void strictGlobalCleartextPenalty(int policyPenalty);
+
+    /**
+    * Sets/removes DNS server address exemptions for cleartext traffic rules
+    *
+    * @param dnsAddrs DNS server addresses to set
+    * @throws ServiceSpecificException in case of failure, with an error code indicating the
+    *         cause of the failure.
+    */
+    void strictDNSCleartextWhitelist(in @utf8InCpp String[] dnsAddrs);
 }

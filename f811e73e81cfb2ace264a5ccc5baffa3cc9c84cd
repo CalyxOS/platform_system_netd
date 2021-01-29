@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "a6862f6a_c7c9957e",
+        "filename": "server/StrictController.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 173,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2021-01-29T19:56:20Z",
+      "side": 1,
+      "message": "I\u0027d add a comment here.\n\n// DNS is cleartext, and we need to get at least the first query through for Private DNS (DNS-over-TLS) configuration.\n// Since this setting is meant to be used in conjunction with Private DNS (and that\u0027s enforced on the Settings side), it means that we can trust the system to not send any plaintext DNS traffic and we can keep this rule.\n// In the future we can replace this with a more restrictive rule\n// Options:\n// 1) Only allow DNS queries to the DNS server\n// 2) Only allow DNS query for the DoT server hostname, using u32 matching?",
+      "revId": "f811e73e81cfb2ace264a5ccc5baffa3cc9c84cd",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0",
+      "unresolved": true
+    }
+  ]
+}

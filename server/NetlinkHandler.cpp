@@ -279,6 +279,7 @@ void NetlinkHandler::notifyRouteChange(bool updated, const std::string& route,
 }
 
 void NetlinkHandler::notifyStrictCleartext(uid_t uid, const std::string& hex) {
+    ALOGE("cleartext traffic detected: uid %d hex %s", uid, hex.c_str());
     LOG_EVENT_FUNC(BINDER_RETRY, onStrictCleartextDetected, uid, hex);
 }
 

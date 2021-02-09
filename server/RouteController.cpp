@@ -262,6 +262,8 @@ int padInterfaceName(const char* input, char* name, size_t* length, uint16_t* pa
                                       uint32_t table, uint32_t fwmark, uint32_t mask,
                                       const char* iif, const char* oif, uid_t uidStart,
                                       uid_t uidEnd) {
+    ALOGE("modifyIpRule: action %u, priority %u, ruleType %u, table %u, fwmark %u, mask %u, iif %s, oif %s, uidStart %u, uidEnd %u",
+           action, priority, ruleType, table, fwmark, mask, iif, oif, uidStart, uidEnd);
     // Ensure that if you set a bit in the fwmark, it's not being ignored by the mask.
     if (fwmark & ~mask) {
         ALOGE("mask 0x%x does not select all the bits set in fwmark 0x%x", mask, fwmark);

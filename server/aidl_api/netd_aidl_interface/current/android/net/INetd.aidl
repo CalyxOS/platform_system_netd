@@ -159,6 +159,7 @@ interface INetd {
   const int IPV6_ADDR_GEN_MODE_STABLE_PRIVACY = 2;
   const int IPV6_ADDR_GEN_MODE_RANDOM = 3;
   const int IPV6_ADDR_GEN_MODE_DEFAULT = 0;
+  const int PENALTY_POLICY_INVALID = 0;
   const int PENALTY_POLICY_ACCEPT = 1;
   const int PENALTY_POLICY_LOG = 2;
   const int PENALTY_POLICY_REJECT = 3;

@@ -168,13 +168,7 @@ int StrictController::setGlobalCleartextPenalty(StrictPenalty penalty) {
         commands.push_back(StringPrintf(":%s -", LOCAL_CLEAR_CAUGHT));
         commands.push_back(StringPrintf("-A %s -j %s", LOCAL_OUTPUT, LOCAL_CLEAR_DETECT));
         commands.push_back(StringPrintf("-A %s -j %s", LOCAL_CLEAR_CAUGHT, LOCAL_CLEAR_CAUGHT_DNS_ACCEPT));
-
-        if (penalty == LOG) {
-            commands.push_back(StringPrintf("-A %s -j %s", LOCAL_CLEAR_CAUGHT, LOCAL_PENALTY_LOG));
-        } else if (penalty == REJECT) {
-            commands.push_back(StringPrintf("-A %s -j %s", LOCAL_CLEAR_CAUGHT,
-                                            LOCAL_PENALTY_REJECT));
-        }
+        commands.push_back(StringPrintf("-A %s -j %s", LOCAL_CLEAR_CAUGHT, penaltyToString(penalty)));
     }
     commands.push_back("COMMIT\n");
 
@@ -190,33 +184,22 @@ int StrictController::setUidCleartextPenalty(uid_t uid, StrictPenalty penalty) {
     std::string perUidChain = StringPrintf("st_clear_caught_%u", uid);
 
     std::vector<std::string> commands;
-    if (penalty == ACCEPT) {
-        // Clean up any old rules
-        commands = {
-            "*filter",
-            StringPrintf("-D %s -m owner --uid-owner %d -j %s",
-                         LOCAL_OUTPUT, uid, LOCAL_CLEAR_DETECT),
-            StringPrintf("-D %s -m owner --uid-owner %d -j %s",
-                         LOCAL_CLEAR_CAUGHT, uid, perUidChain.c_str()),
-            StringPrintf("-F %s", perUidChain.c_str()),
-            StringPrintf("-X %s", perUidChain.c_str()),
-        };
+    commands.push_back("*filter");
+    if (penalty == INVALID) {
+        penalty = ACCEPT;
     } else {
-        // Always take a detour to investigate this UID
-        commands.push_back("*filter");
-        commands.push_back(StringPrintf(":%s -", perUidChain.c_str()));
-        commands.push_back(StringPrintf("-I %s -m owner --uid-owner %d -j %s",
+        commands.push_back(StringPrintf("-D %s -m owner --uid-owner %d -j %s",
                                         LOCAL_OUTPUT, uid, LOCAL_CLEAR_DETECT));
-        commands.push_back(StringPrintf("-I %s -m owner --uid-owner %d -j %s",
+        commands.push_back(StringPrintf("-D %s -m owner --uid-owner %d -j %s",
                                         LOCAL_CLEAR_CAUGHT, uid, perUidChain.c_str()));
-
-        if (penalty == LOG) {
-            commands.push_back(StringPrintf("-A %s -j %s", perUidChain.c_str(), LOCAL_PENALTY_LOG));
-        } else if (penalty == REJECT) {
-            commands.push_back(StringPrintf("-A %s -j %s", perUidChain.c_str(),
-                                            LOCAL_PENALTY_REJECT));
-        }
     }
+    commands.push_back(StringPrintf(":%s -", perUidChain.c_str()));
+    commands.push_back(StringPrintf("-F %s", perUidChain.c_str()));
+    commands.push_back(StringPrintf("-I %s -m owner --uid-owner %d -j %s",
+                                    LOCAL_OUTPUT, uid, LOCAL_CLEAR_DETECT));
+    commands.push_back(StringPrintf("-I %s -m owner --uid-owner %d -j %s",
+                                    LOCAL_CLEAR_CAUGHT, uid, perUidChain.c_str()));
+    commands.push_back(StringPrintf("-A %s -j %s", perUidChain.c_str(), penaltyToString(penalty)));
     commands.push_back("COMMIT\n");
 
     return (execIptablesRestore(V4V6, Join(commands, "\n")) == 0) ? 0 : -EREMOTEIO;
@@ -228,9 +211,21 @@ int StrictController::setDNSCleartextWhitelist(const std::vector<std::string>& s
     commands.push_back(StringPrintf("-F %s", LOCAL_CLEAR_CAUGHT_DNS_ACCEPT));
     for (const auto& server : servers) {
         commands.push_back(StringPrintf("-I %s -d %s -p udp --dport 53 -j %s",
-                                        LOCAL_CLEAR_CAUGHT_DNS_ACCEPT, server.c_str(), "ACCEPT"));
+                                        LOCAL_CLEAR_CAUGHT_DNS_ACCEPT, server.c_str(), penaltyToString(ACCEPT)));
     }
     commands.push_back("COMMIT\n");
 
     return (execIptablesRestore(V4V6, Join(commands, "\n")) == 0) ? 0 : -EREMOTEIO;
+}
+
+inline const char *StrictController::penaltyToString(StrictPenalty penalty) {
+    switch (penalty) {
+    case INVALID:
+    case ACCEPT:
+        return "ACCEPT";
+    case LOG:
+        return LOCAL_PENALTY_LOG;
+    case REJECT:
+        return LOCAL_PENALTY_REJECT;
+    }
 }

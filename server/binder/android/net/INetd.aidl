@@ -531,6 +531,7 @@ interface INetd {
             int timeout,
             in @utf8InCpp String classLabel);
 
+    const int PENALTY_POLICY_INVALID = 0;
     const int PENALTY_POLICY_ACCEPT = 1;
     const int PENALTY_POLICY_LOG = 2;
     const int PENALTY_POLICY_REJECT = 3;

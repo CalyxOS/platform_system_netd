@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "54c83cb8_a61d7350",
+        "filename": "server/StrictController.cpp",
+        "patchSetId": 10
+      },
+      "lineNbr": 230,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2021-03-24T21:22:48Z",
+      "side": 1,
+      "message": "DNS doesn\u0027t always have to be UDP as per the spec but for now this is ok.",
+      "revId": "95e2fcf0353a6033b8dd58f22271024fb47ae07a",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0",
+      "unresolved": true
+    }
+  ]
+}

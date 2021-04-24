@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7d6842d4_72d93a62",
+        "filename": "server/NetdNativeService.cpp",
+        "patchSetId": 5
+      },
+      "lineNbr": 811,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2021-04-24T01:22:47Z",
+      "side": 1,
+      "message": "Why 0? And it should be a variable",
+      "revId": "39af4ede66a2185062ef9671e7b3911d3caea373",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d9df1393_69506320",
+        "filename": "server/StrictController.cpp",
+        "patchSetId": 5
+      },
+      "lineNbr": 195,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2021-04-24T01:22:47Z",
+      "side": 1,
+      "message": "This looks hacky...",
+      "revId": "39af4ede66a2185062ef9671e7b3911d3caea373",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ecaf433f_571a6d3a",
+        "filename": "server/StrictController.cpp",
+        "patchSetId": 5
+      },
+      "lineNbr": 210,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2021-04-24T01:22:47Z",
+      "side": 1,
+      "message": "Variable for \"ACCEPT\"",
+      "revId": "39af4ede66a2185062ef9671e7b3911d3caea373",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0",
+      "unresolved": true
+    }
+  ]
+}

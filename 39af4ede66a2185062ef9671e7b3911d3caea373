@@ -72,6 +72,24 @@
     },
     {
       "key": {
+        "uuid": "97cec731_4037d525",
+        "filename": "server/StrictController.cpp",
+        "patchSetId": 5
+      },
+      "lineNbr": 195,
+      "author": {
+        "id": 1000002
+      },
+      "writtenOn": "2021-04-27T01:19:47Z",
+      "side": 1,
+      "message": "the default is accept anyway",
+      "parentUuid": "a35bd5b0_b5f918cb",
+      "revId": "39af4ede66a2185062ef9671e7b3911d3caea373",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "ecaf433f_571a6d3a",
         "filename": "server/StrictController.cpp",
         "patchSetId": 5

@@ -1,6 +1,7 @@
 {
   "comments": [
     {
+      "unresolved": true,
       "key": {
         "uuid": "7d6842d4_72d93a62",
         "filename": "server/NetdNativeService.cpp",
@@ -14,10 +15,10 @@
       "side": 1,
       "message": "Why 0? And it should be a variable",
       "revId": "39af4ede66a2185062ef9671e7b3911d3caea373",
-      "serverId": "35266860-6252-469c-a67d-185064479fc0",
-      "unresolved": true
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
     },
     {
+      "unresolved": true,
       "key": {
         "uuid": "c1f9a983_5033304d",
         "filename": "server/NetdNativeService.cpp",
@@ -32,10 +33,28 @@
       "message": "see frameworks. netd does not keep track of the state and duplicating entries or deleting entries when there are none is bad (the latter causes crashes). this helps to insert first values and leave things in a good state without causing either problem",
       "parentUuid": "7d6842d4_72d93a62",
       "revId": "39af4ede66a2185062ef9671e7b3911d3caea373",
-      "serverId": "35266860-6252-469c-a67d-185064479fc0",
-      "unresolved": true
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "aa8884e5_b96db5a3",
+        "filename": "server/NetdNativeService.cpp",
+        "patchSetId": 5
+      },
+      "lineNbr": 811,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2021-06-02T17:50:51Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "c1f9a983_5033304d",
+      "revId": "39af4ede66a2185062ef9671e7b3911d3caea373",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    },
+    {
+      "unresolved": true,
       "key": {
         "uuid": "d9df1393_69506320",
         "filename": "server/StrictController.cpp",
@@ -49,10 +68,10 @@
       "side": 1,
       "message": "This looks hacky...",
       "revId": "39af4ede66a2185062ef9671e7b3911d3caea373",
-      "serverId": "35266860-6252-469c-a67d-185064479fc0",
-      "unresolved": true
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
     },
     {
+      "unresolved": true,
       "key": {
         "uuid": "a35bd5b0_b5f918cb",
         "filename": "server/StrictController.cpp",
@@ -67,10 +86,10 @@
       "message": "no other way around it. netd does not keep track of states. the first time a uid is inserted it should not attempt to delete entries (results in crashes)",
       "parentUuid": "d9df1393_69506320",
       "revId": "39af4ede66a2185062ef9671e7b3911d3caea373",
-      "serverId": "35266860-6252-469c-a67d-185064479fc0",
-      "unresolved": true
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
     },
     {
+      "unresolved": true,
       "key": {
         "uuid": "97cec731_4037d525",
         "filename": "server/StrictController.cpp",
@@ -85,10 +104,28 @@
       "message": "the default is accept anyway",
       "parentUuid": "a35bd5b0_b5f918cb",
       "revId": "39af4ede66a2185062ef9671e7b3911d3caea373",
-      "serverId": "35266860-6252-469c-a67d-185064479fc0",
-      "unresolved": true
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c078293f_4c0cd454",
+        "filename": "server/StrictController.cpp",
+        "patchSetId": 5
+      },
+      "lineNbr": 195,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2021-06-02T17:50:51Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "97cec731_4037d525",
+      "revId": "39af4ede66a2185062ef9671e7b3911d3caea373",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    },
+    {
+      "unresolved": true,
       "key": {
         "uuid": "ecaf433f_571a6d3a",
         "filename": "server/StrictController.cpp",
@@ -102,10 +139,10 @@
       "side": 1,
       "message": "Variable for \"ACCEPT\"",
       "revId": "39af4ede66a2185062ef9671e7b3911d3caea373",
-      "serverId": "35266860-6252-469c-a67d-185064479fc0",
-      "unresolved": true
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
     },
     {
+      "unresolved": false,
       "key": {
         "uuid": "11ab8bd5_eacd5311",
         "filename": "server/StrictController.cpp",
@@ -120,8 +157,7 @@
       "message": "Ack",
       "parentUuid": "ecaf433f_571a6d3a",
       "revId": "39af4ede66a2185062ef9671e7b3911d3caea373",
-      "serverId": "35266860-6252-469c-a67d-185064479fc0",
-      "unresolved": false
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
     }
   ]
 }

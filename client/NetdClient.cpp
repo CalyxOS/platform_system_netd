@@ -34,6 +34,7 @@
 #include <android-base/parseint.h>
 #include <android-base/unique_fd.h>
 
+#include "Controllers.h"
 #include "Fwmark.h"
 #include "FwmarkClient.h"
 #include "FwmarkCommand.h"
@@ -41,9 +42,11 @@
 #include "netdutils/ResponseCode.h"
 #include "netdutils/Stopwatch.h"
 #include "netid_client.h"
+#include "TrafficController.h"
 
 using android::base::ParseInt;
 using android::base::unique_fd;
+using android::net::gCtls;
 using android::netdutils::ResponseCode;
 using android::netdutils::Stopwatch;
 
@@ -61,6 +64,7 @@ constexpr char PROPERTY_REDIRECT_SOCKET_CALLS_HOOKED[] = "net.redirect_socket_ca
 std::atomic_uint netIdForProcess(NETID_UNSET);
 std::atomic_uint netIdForResolv(NETID_UNSET);
 std::atomic_bool allowNetworkingForProcess(true);
+std::atomic_int uidForProcess(0);
 
 typedef int (*Accept4FunctionType)(int, sockaddr*, socklen_t*, int);
 typedef int (*ConnectFunctionType)(int, const sockaddr*, socklen_t);
@@ -184,6 +188,9 @@ int netdClientConnect(int sockfd, const sockaddr* addr, socklen_t addrlen) {
 
 int netdClientSocket(int domain, int type, int protocol) {
     // Block creating AF_INET/AF_INET6 socket if networking is not allowed.
+    if (gCtls->trafficCtrl.getUidOwnerValue(uidForProcess.load())) {
+        return -1;
+    }
     if (FwmarkCommand::isSupportedFamily(domain) && !allowNetworkingForProcess.load()) {
         errno = EPERM;
         return -1;
@@ -288,6 +295,10 @@ int dns_open_proxy() {
     const bool use_proxy = (cache_mode == NULL || strcmp(cache_mode, "local") != 0);
     if (!use_proxy) {
         errno = ENOSYS;
+        return -1;
+    }
+
+    if (gCtls->trafficCtrl.getUidOwnerValue(uidForProcess.load())) {
         return -1;
     }
 
@@ -606,7 +617,8 @@ extern "C" void resNetworkCancel(int fd) {
     close(fd);
 }
 
-extern "C" void setAllowNetworkingForProcess(bool allowNetworking) {
+extern "C" void setAllowNetworkingForProcess(int uid, bool allowNetworking) {
+    uidForProcess.store(uid);
     allowNetworkingForProcess.store(allowNetworking);
 }
 

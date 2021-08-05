@@ -708,6 +708,15 @@ int TrafficController::toggleUidOwnerMap(ChildChain chain, bool enable) {
     return -res.code();
 }
 
+bool TrafficController::getNetworkingAllowedForUid(const uid_t uid) {
+    std::lock_guard guard(mMutex);
+    auto uidOwnerValue = mUidOwnerMap.readValue(uid);
+    if (!uidOwnerValue.ok()) {
+        return false;
+    }
+    return uidOwnerValue.value().rule & RESTRICTED_MATCH;
+}
+
 Status TrafficController::swapActiveStatsMap() {
     std::lock_guard guard(mMutex);
 

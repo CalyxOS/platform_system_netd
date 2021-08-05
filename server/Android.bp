@@ -280,6 +280,7 @@ cc_binary {
         "MDnsSdListener.cpp",
         "NetdCommand.cpp",
         "NetdHwService.cpp",
+        "NetdListener.cpp",
         "NetdNativeService.cpp",
         "NetlinkHandler.cpp",
         "Network.cpp",

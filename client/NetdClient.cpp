@@ -14,10 +14,13 @@
  * limitations under the License.
  */
 
+#define LOG_TAG "NetdClient"
+
 #include "NetdClient.h"
 
 #include <arpa/inet.h>
 #include <errno.h>
+#include <log/log.h>
 #include <math.h>
 #include <resolv.h>
 #include <stdlib.h>
@@ -79,6 +82,8 @@ SocketFunctionType libcSocket = nullptr;
 SendmmsgFunctionType libcSendmmsg = nullptr;
 SendmsgFunctionType libcSendmsg = nullptr;
 SendtoFunctionType libcSendto = nullptr;
+
+int isNetworkingDisallowedForProcess();
 
 static bool propertyValueIsTrue(const char* prop_name) {
     char prop_value[PROP_VALUE_MAX] = {0};
@@ -182,7 +187,36 @@ int netdClientConnect(int sockfd, const sockaddr* addr, socklen_t addrlen) {
     return ret;
 }
 
+int createSocket(sockaddr_un proxy_addr) {
+    const auto socketFunc = libcSocket ? libcSocket : socket;
+    int s = socketFunc(AF_UNIX, SOCK_STREAM | SOCK_CLOEXEC, 0);
+    if (s == -1) {
+        return -1;
+    }
+    const int one = 1;
+    setsockopt(s, SOL_SOCKET, SO_REUSEADDR, &one, sizeof(one));
+    const auto connectFunc = libcConnect ? libcConnect : connect;
+    if (TEMP_FAILURE_RETRY(
+                connectFunc(s, (const struct sockaddr*) &proxy_addr, sizeof(proxy_addr))) != 0) {
+        // Store the errno for connect because we only care about why we can't connect to dnsproxyd
+        int storedErrno = errno;
+        close(s);
+        errno = storedErrno;
+        return -1;
+    }
+    return s;
+}
+
+int netdClientSocket() {
+    static const struct sockaddr_un netd_addr = {
+            .sun_family = AF_UNIX,
+            .sun_path = "/dev/socket/netdl",
+    };
+    return createSocket(netd_addr);
+}
+
 int netdClientSocket(int domain, int type, int protocol) {
+    isNetworkingDisallowedForProcess();
     // Block creating AF_INET/AF_INET6 socket if networking is not allowed.
     if (FwmarkCommand::isSupportedFamily(domain) && !allowNetworkingForProcess.load()) {
         errno = EPERM;
@@ -291,6 +325,8 @@ int dns_open_proxy() {
         return -1;
     }
 
+    isNetworkingDisallowedForProcess();
+
     // If networking is not allowed, dns_open_proxy should just fail here.
     // Then eventually, the DNS related functions in local mode will get
     // EPERM while creating socket.
@@ -298,30 +334,13 @@ int dns_open_proxy() {
         errno = EPERM;
         return -1;
     }
-    const auto socketFunc = libcSocket ? libcSocket : socket;
-    int s = socketFunc(AF_UNIX, SOCK_STREAM | SOCK_CLOEXEC, 0);
-    if (s == -1) {
-        return -1;
-    }
-    const int one = 1;
-    setsockopt(s, SOL_SOCKET, SO_REUSEADDR, &one, sizeof(one));
 
     static const struct sockaddr_un proxy_addr = {
             .sun_family = AF_UNIX,
             .sun_path = "/dev/socket/dnsproxyd",
     };
 
-    const auto connectFunc = libcConnect ? libcConnect : connect;
-    if (TEMP_FAILURE_RETRY(
-                connectFunc(s, (const struct sockaddr*) &proxy_addr, sizeof(proxy_addr))) != 0) {
-        // Store the errno for connect because we only care about why we can't connect to dnsproxyd
-        int storedErrno = errno;
-        close(s);
-        errno = storedErrno;
-        return -1;
-    }
-
-    return s;
+    return createSocket(proxy_addr);
 }
 
 auto divCeil(size_t dividend, size_t divisor) {
@@ -392,6 +411,10 @@ bool readResponseCode(int fd, int* result) {
     }
 
     return true;
+}
+
+int isNetworkingDisallowedForProcess() {
+    return netdClientSocket();
 }
 
 }  // namespace

@@ -14,10 +14,13 @@
  * limitations under the License.
  */
 
+#define LOG_TAG "NetdClient"
+
 #include "NetdClient.h"
 
 #include <arpa/inet.h>
 #include <errno.h>
+#include <log/log.h>
 #include <math.h>
 #include <resolv.h>
 #include <stdlib.h>
@@ -61,6 +64,7 @@ constexpr char PROPERTY_REDIRECT_SOCKET_CALLS_HOOKED[] = "net.redirect_socket_ca
 std::atomic_uint netIdForProcess(NETID_UNSET);
 std::atomic_uint netIdForResolv(NETID_UNSET);
 std::atomic_bool allowNetworkingForProcess(true);
+std::atomic_uint uidForProcess(0);
 
 typedef int (*Accept4FunctionType)(int, sockaddr*, socklen_t*, int);
 typedef int (*ConnectFunctionType)(int, const sockaddr*, socklen_t);
@@ -79,6 +83,8 @@ SocketFunctionType libcSocket = nullptr;
 SendmmsgFunctionType libcSendmmsg = nullptr;
 SendmsgFunctionType libcSendmsg = nullptr;
 SendtoFunctionType libcSendto = nullptr;
+
+bool getNetworkingAllowedForProcess();
 
 static bool propertyValueIsTrue(const char* prop_name) {
     char prop_value[PROP_VALUE_MAX] = {0};
@@ -182,10 +188,41 @@ int netdClientConnect(int sockfd, const sockaddr* addr, socklen_t addrlen) {
     return ret;
 }
 
+int createSocket(sockaddr_un proxy_addr) {
+    const auto socketFunc = libcSocket ? libcSocket : socket;
+    int s = socketFunc(AF_UNIX, SOCK_STREAM | SOCK_CLOEXEC, 0);
+    if (s == -1) {
+        return -1;
+    }
+    const int one = 1;
+    setsockopt(s, SOL_SOCKET, SO_REUSEADDR, &one, sizeof(one));
+    const auto connectFunc = libcConnect ? libcConnect : connect;
+    if (TEMP_FAILURE_RETRY(
+                connectFunc(s, (const struct sockaddr*) &proxy_addr, sizeof(proxy_addr))) != 0) {
+        // Store the errno for connect because we only care about why we can't connect to dnsproxyd
+        int storedErrno = errno;
+        close(s);
+        errno = storedErrno;
+        return -1;
+    }
+    return s;
+}
+
+int netdClientSocket() {
+    static const struct sockaddr_un netd_addr = {
+            .sun_family = AF_UNIX,
+            .sun_path = "/dev/socket/netdl",
+    };
+    return createSocket(netd_addr);
+}
+
 int netdClientSocket(int domain, int type, int protocol) {
     // Block creating AF_INET/AF_INET6 socket if networking is not allowed.
     if (FwmarkCommand::isSupportedFamily(domain) && !allowNetworkingForProcess.load()) {
         errno = EPERM;
+        return -1;
+    }
+    if (!getNetworkingAllowedForProcess()) {
         return -1;
     }
     int socketFd = libcSocket(domain, type, protocol);
@@ -298,30 +335,17 @@ int dns_open_proxy() {
         errno = EPERM;
         return -1;
     }
-    const auto socketFunc = libcSocket ? libcSocket : socket;
-    int s = socketFunc(AF_UNIX, SOCK_STREAM | SOCK_CLOEXEC, 0);
-    if (s == -1) {
+
+    if (!getNetworkingAllowedForProcess()) {
         return -1;
     }
-    const int one = 1;
-    setsockopt(s, SOL_SOCKET, SO_REUSEADDR, &one, sizeof(one));
 
     static const struct sockaddr_un proxy_addr = {
             .sun_family = AF_UNIX,
             .sun_path = "/dev/socket/dnsproxyd",
     };
 
-    const auto connectFunc = libcConnect ? libcConnect : connect;
-    if (TEMP_FAILURE_RETRY(
-                connectFunc(s, (const struct sockaddr*) &proxy_addr, sizeof(proxy_addr))) != 0) {
-        // Store the errno for connect because we only care about why we can't connect to dnsproxyd
-        int storedErrno = errno;
-        close(s);
-        errno = storedErrno;
-        return -1;
-    }
-
-    return s;
+    return createSocket(proxy_addr);
 }
 
 auto divCeil(size_t dividend, size_t divisor) {
@@ -392,6 +416,30 @@ bool readResponseCode(int fd, int* result) {
     }
 
     return true;
+}
+
+bool getNetworkingAllowedForProcess() {
+    if (uidForProcess.load() < 10000) {
+        return true;
+    }
+    int fd = netdClientSocket();
+    if (fd == -1) {
+        return true;
+    }
+    const std::string cmd = "netd traffic getuidnetworking";
+    if (cmd.size() > MAX_CMD_SIZE) {
+        // Cmd size must less than buffer size of FrameworkListener
+        return true;
+    }
+    if (sendData(fd, cmd.c_str(), cmd.size() + 1) < 0) {
+        close(fd);
+        return true;
+    }
+    int networkingAllowedForProcess;
+    if (!readResponseCode(fd, &networkingAllowedForProcess)) {
+        return true;
+    }
+    return networkingAllowedForProcess;
 }
 
 }  // namespace
@@ -606,7 +654,8 @@ extern "C" void resNetworkCancel(int fd) {
     close(fd);
 }
 
-extern "C" void setAllowNetworkingForProcess(bool allowNetworking) {
+extern "C" void setAllowNetworkingForProcess(int uid, bool allowNetworking) {
+    uidForProcess.store(uid);
     allowNetworkingForProcess.store(allowNetworking);
 }
 

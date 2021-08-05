@@ -43,6 +43,7 @@
 #include "MDnsService.h"
 #include "NFLogListener.h"
 #include "NetdConstants.h"
+#include "NetdListener.h"
 #include "NetdHwService.h"
 #include "NetdNativeService.h"
 #include "NetlinkManager.h"
@@ -61,6 +62,7 @@ using android::net::gLog;
 using android::net::makeNFLogListener;
 using android::net::MDnsService;
 using android::net::NetdHwService;
+using android::net::NetdListener;
 using android::net::NetdNativeService;
 using android::net::NetlinkManager;
 using android::net::NFLogListener;
@@ -121,7 +123,8 @@ int main() {
     // FrameworkListener does this on initialization as well, but we only initialize these
     // components after having initialized other subsystems that can fork.
     for (const auto& sock :
-         {DNSPROXYLISTENER_SOCKET_NAME, FwmarkServer::SOCKET_NAME, MDnsSdListener::SOCKET_NAME}) {
+         {DNSPROXYLISTENER_SOCKET_NAME, FwmarkServer::SOCKET_NAME, MDnsSdListener::SOCKET_NAME,
+         NetdListener::SOCKET_NAME}) {
         setCloseOnExec(sock);
         gLog.info("setCloseOnExec(%s)", sock);
     }
@@ -176,6 +179,12 @@ int main() {
     // Note that only call initDnsResolver after gCtls initializing.
     if (!initDnsResolver()) {
         ALOGE("Unable to init resolver");
+        exit(1);
+    }
+
+    NetdListener netdl;
+    if (netdl.startListener()) {
+        ALOGE("Unable to start NetdListener (%s)", strerror(errno));
         exit(1);
     }
 

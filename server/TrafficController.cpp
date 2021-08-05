@@ -852,6 +852,17 @@ bool TrafficController::getBpfEnabled() {
     return mBpfEnabled;
 }
 
+uint8_t TrafficController::getUidRule(uid_t uid) {
+    std::lock_guard guard(mMutex);
+    ALOGD("getUidRule(%d)", uid);
+    auto uidOwnerValue = mUidOwnerMap.readValue(uid);
+    if (!uidOwnerValue.ok()) {
+        return -1;
+    }
+    uint8_t rule = uidOwnerValue.value().rule;
+    return rule;
+}
+
 Status TrafficController::swapActiveStatsMap() {
     std::lock_guard guard(mMutex);
 

@@ -77,6 +77,8 @@ class TrafficController {
      */
     int deleteTagData(uint32_t tag, uid_t uid, uid_t callingUid) EXCLUDES(mMutex);
 
+    bool getNetworkingAllowedForUid(const uid_t uid);
+
     /*
      * Swap the stats map config from current active stats map to the idle one.
      */

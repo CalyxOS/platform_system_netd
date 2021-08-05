@@ -83,6 +83,8 @@ class TrafficController {
      */
     bool getBpfEnabled();
 
+    bool getNetworkingAllowedForUid(const uid_t uid);
+
     /*
      * Swap the stats map config from current active stats map to the idle one.
      */

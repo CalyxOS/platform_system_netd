@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4089abdf_36c72b16",
+        "filename": "client/Android.bp",
+        "patchSetId": 12
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2021-08-10T11:11:19Z",
+      "side": 1,
+      "message": "Doesn\u0027t look like this is used anymore, should remove.",
+      "revId": "12b272deecf0e09b54b023e1bfb87f76e6bd594f",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c7374b6d_0467f323",
+        "filename": "client/NetdClient.cpp",
+        "patchSetId": 12
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2021-08-10T11:11:19Z",
+      "side": 1,
+      "message": "Same for this and tag above.",
+      "revId": "12b272deecf0e09b54b023e1bfb87f76e6bd594f",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8b2658a9_b1970f7a",
+        "filename": "client/NetdClient.cpp",
+        "patchSetId": 12
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2021-08-10T11:11:19Z",
+      "side": 1,
+      "message": "Add a comment here",
+      "revId": "12b272deecf0e09b54b023e1bfb87f76e6bd594f",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "940d6be7_343e78ef",
+        "filename": "client/NetdClient.cpp",
+        "patchSetId": 12
+      },
+      "lineNbr": 421,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2021-08-10T11:11:19Z",
+      "side": 1,
+      "message": "Add a comment stating what this does, and also more importantly that this always defaults to returning true to have a fallback / not cause issues.",
+      "revId": "12b272deecf0e09b54b023e1bfb87f76e6bd594f",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4b2b36f8_3a69a66c",
+        "filename": "client/NetdClient.cpp",
+        "patchSetId": 12
+      },
+      "lineNbr": 422,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2021-08-10T11:11:19Z",
+      "side": 1,
+      "message": "Thinking about it a bit more, this could just be an `\u003d\u003d 0` check.\n\n0 is the default uid. uid is set from zygote, if it\u0027s not set we can assume networking should be allowed.\n\nIf it\u0027s set, could we assume that the uid rule check will work?\n\nIf not, then we should change this check to match what the frameworks has, i.e. isApp(uid) - where it only allows network policy control for \"apps\"",
+      "revId": "12b272deecf0e09b54b023e1bfb87f76e6bd594f",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    }
+  ]
+}

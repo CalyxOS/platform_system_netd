@@ -88,6 +88,24 @@
       "serverId": "35266860-6252-469c-a67d-185064479fc0"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0db12a3f_9f1c0c46",
+        "filename": "client/NetdClient.cpp",
+        "patchSetId": 12
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 1000002
+      },
+      "writtenOn": "2021-08-11T14:51:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8b2658a9_b1970f7a",
+      "revId": "12b272deecf0e09b54b023e1bfb87f76e6bd594f",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "940d6be7_343e78ef",
@@ -101,6 +119,24 @@
       "writtenOn": "2021-08-10T11:11:19Z",
       "side": 1,
       "message": "Add a comment stating what this does, and also more importantly that this always defaults to returning true to have a fallback / not cause issues.",
+      "revId": "12b272deecf0e09b54b023e1bfb87f76e6bd594f",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a332c72d_1027e8b6",
+        "filename": "client/NetdClient.cpp",
+        "patchSetId": 12
+      },
+      "lineNbr": 421,
+      "author": {
+        "id": 1000002
+      },
+      "writtenOn": "2021-08-11T14:51:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "940d6be7_343e78ef",
       "revId": "12b272deecf0e09b54b023e1bfb87f76e6bd594f",
       "serverId": "35266860-6252-469c-a67d-185064479fc0"
     },

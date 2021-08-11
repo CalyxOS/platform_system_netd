@@ -18,6 +18,24 @@
       "serverId": "35266860-6252-469c-a67d-185064479fc0"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "52da7b6c_bca6ef8b",
+        "filename": "client/Android.bp",
+        "patchSetId": 12
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1000002
+      },
+      "writtenOn": "2021-08-11T14:35:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4089abdf_36c72b16",
+      "revId": "12b272deecf0e09b54b023e1bfb87f76e6bd594f",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c7374b6d_0467f323",
@@ -31,6 +49,24 @@
       "writtenOn": "2021-08-10T11:11:19Z",
       "side": 1,
       "message": "Same for this and tag above.",
+      "revId": "12b272deecf0e09b54b023e1bfb87f76e6bd594f",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9b446067_e0af913e",
+        "filename": "client/NetdClient.cpp",
+        "patchSetId": 12
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1000002
+      },
+      "writtenOn": "2021-08-11T14:35:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c7374b6d_0467f323",
       "revId": "12b272deecf0e09b54b023e1bfb87f76e6bd594f",
       "serverId": "35266860-6252-469c-a67d-185064479fc0"
     },
@@ -82,6 +118,24 @@
       "writtenOn": "2021-08-10T11:11:19Z",
       "side": 1,
       "message": "Thinking about it a bit more, this could just be an `\u003d\u003d 0` check.\n\n0 is the default uid. uid is set from zygote, if it\u0027s not set we can assume networking should be allowed.\n\nIf it\u0027s set, could we assume that the uid rule check will work?\n\nIf not, then we should change this check to match what the frameworks has, i.e. isApp(uid) - where it only allows network policy control for \"apps\"",
+      "revId": "12b272deecf0e09b54b023e1bfb87f76e6bd594f",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "142b307d_37532ddb",
+        "filename": "client/NetdClient.cpp",
+        "patchSetId": 12
+      },
+      "lineNbr": 422,
+      "author": {
+        "id": 1000002
+      },
+      "writtenOn": "2021-08-11T14:35:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4b2b36f8_3a69a66c",
       "revId": "12b272deecf0e09b54b023e1bfb87f76e6bd594f",
       "serverId": "35266860-6252-469c-a67d-185064479fc0"
     }

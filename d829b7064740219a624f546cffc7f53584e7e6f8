@@ -18,6 +18,24 @@
       "serverId": "35266860-6252-469c-a67d-185064479fc0"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9770b7a8_34b8c375",
+        "filename": "client/NetdClient.cpp",
+        "patchSetId": 15
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2021-08-25T18:27:04Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d6249eb6_91530a79",
+      "revId": "d829b7064740219a624f546cffc7f53584e7e6f8",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2294c6c3_8daa7db2",
@@ -31,6 +49,24 @@
       "writtenOn": "2021-08-11T11:48:44Z",
       "side": 1,
       "message": "Also add that 0 is assumed to be the default whenever the uid isn\u0027t set from zygote (and thus networking is allowed by default unless explicitly blocked)",
+      "revId": "d829b7064740219a624f546cffc7f53584e7e6f8",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6c1c2f68_2aaafd64",
+        "filename": "client/NetdClient.cpp",
+        "patchSetId": 15
+      },
+      "lineNbr": 420,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2021-08-25T18:27:04Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2294c6c3_8daa7db2",
       "revId": "d829b7064740219a624f546cffc7f53584e7e6f8",
       "serverId": "35266860-6252-469c-a67d-185064479fc0"
     }

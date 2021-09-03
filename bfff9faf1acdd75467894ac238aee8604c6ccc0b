@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "58f8c969_32da563c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2021-09-03T15:28:31Z",
+      "side": 1,
+      "message": "LGTM",
+      "revId": "bfff9faf1acdd75467894ac238aee8604c6ccc0b",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ac792a19_aadc49ef",
@@ -24,6 +41,30 @@
       "serverId": "35266860-6252-469c-a67d-185064479fc0"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2023363b_ddbdb198",
+        "filename": "client/NetdClient.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 427,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2021-09-03T15:28:31Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "ac792a19_aadc49ef",
+      "range": {
+        "startLine": 427,
+        "startChar": 8,
+        "endLine": 427,
+        "endChar": 20
+      },
+      "revId": "bfff9faf1acdd75467894ac238aee8604c6ccc0b",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1211c2ef_07355c9b",
@@ -37,6 +78,30 @@
       "writtenOn": "2021-09-03T15:18:29Z",
       "side": 1,
       "message": "Otherwise add close before all returns to ensure socket is closed no matter what if it was opened?",
+      "range": {
+        "startLine": 432,
+        "startChar": 8,
+        "endLine": 432,
+        "endChar": 18
+      },
+      "revId": "bfff9faf1acdd75467894ac238aee8604c6ccc0b",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4139ef3f_738d4ae3",
+        "filename": "client/NetdClient.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 432,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2021-09-03T15:28:31Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "1211c2ef_07355c9b",
       "range": {
         "startLine": 432,
         "startChar": 8,

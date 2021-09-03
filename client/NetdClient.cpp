@@ -428,7 +428,8 @@ bool getNetworkingAllowedForProcess() {
     }
     const std::string cmd = "netd traffic getuidnetworking";
     if (cmd.size() > MAX_CMD_SIZE) {
-        // Cmd size must less than buffer size of FrameworkListener
+        // Cmd size must be less than buffer size of FrameworkListener
+        close(fd);
         return true;
     }
     if (sendData(fd, cmd.c_str(), cmd.size() + 1) < 0) {
@@ -437,8 +438,10 @@ bool getNetworkingAllowedForProcess() {
     }
     int networkingAllowedForProcess;
     if (!readResponseCode(fd, &networkingAllowedForProcess)) {
+        close(fd);
         return true;
     }
+    close(fd);
     return networkingAllowedForProcess;
 }
 

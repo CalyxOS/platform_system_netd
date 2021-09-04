@@ -18,6 +18,23 @@
       "serverId": "35266860-6252-469c-a67d-185064479fc0"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "115e2e6f_9bb23a95",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2021-09-04T08:04:21Z",
+      "side": 1,
+      "message": "Shipping for now, we can certainly made improvements later after more thought.\n\nFixes crash with the \"Piktures\" app.",
+      "revId": "bfff9faf1acdd75467894ac238aee8604c6ccc0b",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ac792a19_aadc49ef",

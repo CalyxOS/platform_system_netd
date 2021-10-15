@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6ac63880_0df3f8b4",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2021-10-15T15:49:42Z",
+      "side": 1,
+      "message": "I haven\u0027t looked at the code in detail yet, but I was wondering if there\u0027s anything in the AOSP restricted networking code we can re-use for this.",
+      "revId": "a011a4b0378f7374b8e693ab6be8d0c2a3911791",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    }
+  ]
+}

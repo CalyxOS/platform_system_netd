@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d17e5d37_4507094b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000002
+      },
+      "writtenOn": "2021-10-27T04:50:24Z",
+      "side": 1,
+      "message": "Can abandon. Now handled by latest changes to global cleartext",
+      "revId": "6ccd37416f7172ca965c89a3b93468fcc45a12aa",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "80876964_b7c9fa8a",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2021-11-04T13:11:33Z",
+      "side": 1,
+      "message": "Drop this line, no longer true.",
+      "revId": "cd440b8a0ed3b6e950b145d495e49ef038af4a34",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f469e469_6596dbc4",
+        "filename": "server/StrictController.cpp",
+        "patchSetId": 5
+      },
+      "lineNbr": 169,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2021-11-04T13:11:33Z",
+      "side": 1,
+      "message": "This could use a comment explaining why.",
+      "revId": "cd440b8a0ed3b6e950b145d495e49ef038af4a34",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    }
+  ]
+}

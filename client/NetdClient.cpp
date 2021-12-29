@@ -58,6 +58,12 @@ constexpr char PROPERTY_REDIRECT_SOCKET_CALLS[] = "ro.vendor.redirect_socket_cal
 // System Server at runtime. Note: accept4(), socket(), connect() are always shimmed.
 constexpr char PROPERTY_REDIRECT_SOCKET_CALLS_HOOKED[] = "net.redirect_socket_calls.hooked";
 
+// frameworks/base/core/java/android/os/UserHandle.java
+#define PER_USER_RANGE 100000
+// frameworks/base/core/java/android/os/Process.java
+#define FIRST_APPLICATION_UID 10000
+#define LAST_APPLICATION_UID 19999
+
 std::atomic_uint netIdForProcess(NETID_UNSET);
 std::atomic_uint netIdForResolv(NETID_UNSET);
 std::atomic_bool allowNetworkingForProcess(true);
@@ -416,10 +422,20 @@ bool readResponseCode(int fd, int* result) {
     return true;
 }
 
+// frameworks/base/core/java/android/os/UserHandle.java
+bool isApp(std::atomic_uint uid) {
+    std::atomic_uint appId = uid % PER_USER_RANGE;
+    return appId >= FIRST_APPLICATION_UID && appId <= LAST_APPLICATION_UID;
+}
+
 // Default to true for root UID (because the value is not set by Zygote during boot) and
 // in case of errors obtaining the status from TrafficController
 bool getNetworkingAllowedForProcess() {
     if (uidForProcess.load() == 0) {
+        return true;
+    }
+    // Always allow non-app uids, since framework doesn't allow setting firewall rules for those uids
+    if (!isApp(uidForProcess.load())) {
         return true;
     }
     int fd = netdClientSocket();

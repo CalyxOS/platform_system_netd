@@ -51,6 +51,24 @@
       "message": "This could use a comment explaining why.",
       "revId": "cd440b8a0ed3b6e950b145d495e49ef038af4a34",
       "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a2c7553a_033a93f4",
+        "filename": "server/StrictController.cpp",
+        "patchSetId": 5
+      },
+      "lineNbr": 169,
+      "author": {
+        "id": 1000002
+      },
+      "writtenOn": "2021-12-29T10:46:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f469e469_6596dbc4",
+      "revId": "cd440b8a0ed3b6e950b145d495e49ef038af4a34",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
     }
   ]
 }

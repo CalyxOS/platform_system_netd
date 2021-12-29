@@ -710,10 +710,23 @@ int TrafficController::toggleUidOwnerMap(ChildChain chain, bool enable) {
 
 bool TrafficController::getNetworkingAllowedForUid(const uid_t uid) {
     std::lock_guard guard(mMutex);
+    uint32_t key = UID_RULES_CONFIGURATION_KEY;
+    auto configuration = mConfigurationMap.readValue(key);
+    if (!configuration.ok()) {
+        ALOGE("Cannot read the configuration from map: %s",
+            configuration.error().message().c_str());
+        return true;
+    }
+    // If the restricted firewall chain is disabled, networking is allowed
+    if (!(configuration.value() & RESTRICTED_MATCH)) {
+        return true;
+    }
+    // If the uid owner map does not contain the uid, networking is disallowed
     auto uidOwnerValue = mUidOwnerMap.readValue(uid);
     if (!uidOwnerValue.ok()) {
         return false;
     }
+    // Otherwise, networking is allowed if the uid is allowlisted
     return uidOwnerValue.value().rule & RESTRICTED_MATCH;
 }
 

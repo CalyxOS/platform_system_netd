@@ -33,6 +33,7 @@
 #include <DnsProxydProtocol.h>  // NETID_USE_LOCAL_NAMESERVERS
 #include <android-base/parseint.h>
 #include <android-base/unique_fd.h>
+#include <cutils/misc.h>  // FIRST_APPLICATION_UID, LAST_APPLICATION_UID
 
 #include "Fwmark.h"
 #include "FwmarkClient.h"
@@ -40,6 +41,7 @@
 #include "netdclient_priv.h"
 #include "netdutils/ResponseCode.h"
 #include "netdutils/Stopwatch.h"
+#include "netdutils/UidConstants.h" // PER_USER_RANGE
 #include "netid_client.h"
 
 using android::base::ParseInt;
@@ -416,10 +418,20 @@ bool readResponseCode(int fd, int* result) {
     return true;
 }
 
+// frameworks/base/core/java/android/os/UserHandle.java
+bool isApp(std::atomic_uint uid) {
+    std::atomic_uint appId = uid % PER_USER_RANGE;
+    return appId >= FIRST_APPLICATION_UID && appId <= LAST_APPLICATION_UID;
+}
+
 // Default to true for root UID (because the value is not set by Zygote during boot) and
 // in case of errors obtaining the status from TrafficController
 bool getNetworkingAllowedForProcess() {
     if (uidForProcess.load() == 0) {
+        return true;
+    }
+    // Always allow non-app uids, since framework doesn't allow setting firewall rules for those uids
+    if (!isApp(uidForProcess.load())) {
         return true;
     }
     int fd = netdClientSocket();

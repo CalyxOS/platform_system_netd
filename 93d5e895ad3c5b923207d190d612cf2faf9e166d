@@ -16,6 +16,24 @@
       "message": "I think it\u0027s still good to do this, for the reason mentioned above.\n\nFrameworks already has this check in other places where networking is modified.\n\nSince this is code we\u0027re adding, I think we should replicate this check.\n\nIt\u0027d cover any scenario we would have missed.\n\nIt still is an isApp check so we can be sure this won\u0027t let any third party app bypass these checks.",
       "revId": "93d5e895ad3c5b923207d190d612cf2faf9e166d",
       "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7ef83e50_ead6c0df",
+        "filename": "client/NetdClient.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 433,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2021-12-30T00:48:36Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "b47d9e9e_7b79007b",
+      "revId": "93d5e895ad3c5b923207d190d612cf2faf9e166d",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
     }
   ]
 }

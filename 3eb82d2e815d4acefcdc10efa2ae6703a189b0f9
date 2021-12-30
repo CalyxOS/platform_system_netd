@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "561b7349_bccc88cb",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2021-12-30T00:44:50Z",
+      "side": 1,
+      "message": "This looks ok.\n\nAs discussed, it would cover:\n* Apps with the right permission to bypass restricted networking mode\n* Apps explicitly allowed in restricted networking mode\n\nIt _might_ not include\n* Anything where the permission is missed, either AOSP or ours or proprietary\n* ?\n\nStill, good to do this.",
+      "revId": "3eb82d2e815d4acefcdc10efa2ae6703a189b0f9",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b3c89a5d_dddefd7f",
+        "filename": "server/BandwidthController.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 225,
+      "author": {
+        "id": 1000002
+      },
+      "writtenOn": "2022-01-17T13:12:52Z",
+      "side": 1,
+      "message": "My understanding of how background data and data saver work is:\n1. normally only applies to metered network (bw_costly_shared)\n2. which, if it has not matches jumps to a penalty chain (bw_penalty_box / restrict background data toggle)\n3. which, if it has no matches jumps to an allowlist chain (bw_happy_box / unrestricted data)\n4. which, if it has no matches jumps to data saver\n5. which, if it has no matches returns\n\nNow since we apply bw_penalty_box to bw_INPUT, bw_FORWARD and bw_OUTPUT and not just to bw_costly_shared we also apply unrestricted data and data saver to them not just background data restrictions",
+      "range": {
+        "startLine": 225,
+        "startChar": 16,
+        "endLine": 225,
+        "endChar": 29
+      },
+      "revId": "edfe86d30da0e9d8d145b9f72248abb98d397b43",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    }
+  ]
+}

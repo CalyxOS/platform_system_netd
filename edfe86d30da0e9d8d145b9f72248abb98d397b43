@@ -22,6 +22,30 @@
       },
       "revId": "edfe86d30da0e9d8d145b9f72248abb98d397b43",
       "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "53d19423_2b280cfd",
+        "filename": "server/BandwidthController.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 225,
+      "author": {
+        "id": 1000002
+      },
+      "writtenOn": "2022-01-17T13:19:49Z",
+      "side": 1,
+      "message": "In other words, with this change I believe it is not only restrict background data that applies globally but unrestricted data usage and data saver too",
+      "parentUuid": "b3c89a5d_dddefd7f",
+      "range": {
+        "startLine": 225,
+        "startChar": 16,
+        "endLine": 225,
+        "endChar": 29
+      },
+      "revId": "edfe86d30da0e9d8d145b9f72248abb98d397b43",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
     }
   ]
 }

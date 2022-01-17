@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "46879f14_968557ce",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2022-01-17T18:02:23Z",
+      "side": 1,
+      "message": "Let\u0027s add an explanation here",
+      "revId": "6a8ad9e3de370501a6b75f7e1c6a6d811192c808",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d3b00e83_c2697663",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2022-01-17T18:02:23Z",
+      "side": 1,
+      "message": "LGTM, if it works.",
+      "revId": "6a8ad9e3de370501a6b75f7e1c6a6d811192c808",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    }
+  ]
+}

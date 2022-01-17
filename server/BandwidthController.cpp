@@ -219,8 +219,8 @@ std::vector<std::string> getBasicAccountingCommands() {
             StringPrintf("-A bw_INPUT -j MARK --or-mark 0x%x", uidBillingMask),
             "-A bw_OUTPUT -j bw_global_alert", "-A bw_OUTPUT -j bw_penalty_box",
             "-A bw_FORWARD -j bw_penalty_box",
+            "-A bw_costly_shared -j bw_happy_box",
             ("-I bw_penalty_box -m bpf --object-pinned " XT_BPF_DENYLIST_PROG_PATH " -j REJECT"),
-            "-A bw_penalty_box -j bw_happy_box",
             "-A bw_happy_box -j bw_data_saver",
             "-A bw_data_saver -j RETURN",
             ("-I bw_happy_box -m bpf --object-pinned " XT_BPF_ALLOWLIST_PROG_PATH " -j RETURN"),
@@ -485,7 +485,6 @@ int BandwidthController::setInterfaceQuota(const std::string& iface, int64_t max
     std::vector<std::string> cmds = {
             "*filter",
             StringPrintf(":%s -", chain.c_str()),
-            StringPrintf("-A %s -j bw_penalty_box", chain.c_str()),
             StringPrintf("-I bw_INPUT %d -i %s -j %s", ruleInsertPos, iface.c_str(), chain.c_str()),
             StringPrintf("-I bw_OUTPUT %d -o %s -j %s", ruleInsertPos, iface.c_str(),
                          chain.c_str()),

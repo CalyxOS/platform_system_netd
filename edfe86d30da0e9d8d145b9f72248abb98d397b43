@@ -46,6 +46,47 @@
       },
       "revId": "edfe86d30da0e9d8d145b9f72248abb98d397b43",
       "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8777d8ed_4336e9e3",
+        "filename": "server/BandwidthController.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 225,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2022-01-17T13:24:56Z",
+      "side": 1,
+      "message": "https://linux.die.net/man/8/iptables\n\n-A, --append chain rule-specification\nAppend one or more rules to the end of the selected chain.\n\n-j, --jump target\nThis specifies the target of the rule; i.e., what to do if the packet matches it.\n\n1. Ack\n2. no matches*, Ack\n3. Ack\n4. Ack\n5. Ack\n\nI see what you mean. 11 was the same, https://review.calyxos.org/c/CalyxOS/platform_system_netd/+/1957/1/server/BandwidthController.cpp\n\nWe should do an `iptables -L` diff with and without this change.\n\nAlso, does the actual behaviour on device match your hypothesis? Could you test?",
+      "parentUuid": "53d19423_2b280cfd",
+      "range": {
+        "startLine": 225,
+        "startChar": 16,
+        "endLine": 225,
+        "endChar": 29
+      },
+      "revId": "edfe86d30da0e9d8d145b9f72248abb98d397b43",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fecb3d8e_1a46f7ee",
+        "filename": "server/BandwidthController.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 488,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2022-01-17T13:24:56Z",
+      "side": 1,
+      "message": "Looks like I also missed this one in 12.",
+      "revId": "edfe86d30da0e9d8d145b9f72248abb98d397b43",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
     }
   ]
 }

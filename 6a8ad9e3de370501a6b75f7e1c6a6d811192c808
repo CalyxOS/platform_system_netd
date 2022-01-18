@@ -33,6 +33,23 @@
       "message": "LGTM, if it works.",
       "revId": "6a8ad9e3de370501a6b75f7e1c6a6d811192c808",
       "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "65d6f6bc_87abd7c3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000002
+      },
+      "writtenOn": "2022-01-18T09:15:01Z",
+      "side": 1,
+      "message": "Background data toggle is working as expected. Data saver no longer applies globally but I can\u0027t tell if it\u0027s doing it\u0027s job properly either. Would like some feedback on it",
+      "revId": "6a8ad9e3de370501a6b75f7e1c6a6d811192c808",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
     }
   ]
 }

@@ -18,6 +18,7 @@
 #define NETD_SERVER_FWMARK_SERVER_H
 
 #include "EventReporter.h"
+#include "OemNetdListener.h"
 #include "sysutils/SocketListener.h"
 
 namespace android {

@@ -159,8 +159,18 @@ aidl_interface {
     local_include_dir: "binder",
     srcs: [
         "binder/com/android/internal/net/IOemNetd.aidl",
+        "binder/com/android/internal/net/IOemNetdEventListener.aidl",
         "binder/com/android/internal/net/IOemNetdUnsolicitedEventListener.aidl",
     ],
+    backend: {
+        java: {
+            apex_available: [
+                "//apex_available:platform",
+                "com.android.tethering",
+            ],
+            min_sdk_version: "29",
+        },
+    },
 }
 
 // These are used in netd_integration_test

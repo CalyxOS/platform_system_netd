@@ -23,11 +23,25 @@ namespace android {
 namespace internal {
 namespace net {
 
+::android::sp<OemNetdListener> OemNetdListener::getListenerInternal() {
+    return ::android::sp<OemNetdListener>::make();
+}
+
 ::android::sp<::android::IBinder> OemNetdListener::getListener() {
     // Thread-safe initialization.
-    static ::android::sp<OemNetdListener> listener = ::android::sp<OemNetdListener>::make();
+    static ::android::sp<OemNetdListener> listener = getListenerInternal();
     static ::android::sp<::android::IBinder> sIBinder = ::android::IInterface::asBinder(listener);
     return sIBinder;
+}
+
+::android::sp<IOemNetdEventListener> OemNetdListener::getOemNetdEventListener() {
+    std::lock_guard lock(mOemEventMutex);
+    if (mOemNetdEventListener == nullptr) {
+        ::android::sp<::android::IBinder> b = ::android::defaultServiceManager()->checkService(
+                ::android::String16("oem_netd_listener"));
+        mOemNetdEventListener = ::android::interface_cast<IOemNetdEventListener>(b);
+    }
+    return mOemNetdEventListener;
 }
 
 ::android::binder::Status OemNetdListener::isAlive(bool* alive) {

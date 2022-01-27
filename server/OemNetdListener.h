@@ -21,7 +21,9 @@
 #include <mutex>
 
 #include <android-base/thread_annotations.h>
+#include <binder/IServiceManager.h>
 #include "com/android/internal/net/BnOemNetd.h"
+#include "com/android/internal/net/IOemNetdEventListener.h"
 #include "com/android/internal/net/IOemNetdUnsolicitedEventListener.h"
 
 namespace com {
@@ -34,8 +36,13 @@ class OemNetdListener : public BnOemNetd {
     using OemUnsolListenerMap = std::map<const ::android::sp<IOemNetdUnsolicitedEventListener>,
                                          const ::android::sp<::android::IBinder::DeathRecipient>>;
 
+    // Returns the binder reference to the netd events listener service, attempting to fetch it if
+    // we do not have it already. This method is threadsafe.
+    ::android::sp<IOemNetdEventListener> getOemNetdEventListener();
+
     OemNetdListener() = default;
     ~OemNetdListener() = default;
+    static ::android::sp<OemNetdListener> getListenerInternal();
     static ::android::sp<::android::IBinder> getListener();
 
     ::android::binder::Status isAlive(bool* alive) override;
@@ -43,9 +50,13 @@ class OemNetdListener : public BnOemNetd {
             const ::android::sp<IOemNetdUnsolicitedEventListener>& listener) override;
 
   private:
+    std::mutex mOemEventMutex;
     std::mutex mOemUnsolicitedMutex;
 
+    ::android::sp<IOemNetdEventListener> mOemNetdEventListener GUARDED_BY(mOemEventMutex);
+
     OemUnsolListenerMap mOemUnsolListenerMap GUARDED_BY(mOemUnsolicitedMutex);
+
 
     void registerOemUnsolicitedEventListenerInternal(
             const ::android::sp<IOemNetdUnsolicitedEventListener>& listener)

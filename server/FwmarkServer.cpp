@@ -38,6 +38,8 @@ using android::String16;
 using android::base::ReceiveFileDescriptorVector;
 using android::base::unique_fd;
 using android::net::metrics::INetdEventListener;
+using com::android::internal::net::OemNetdListener;
+using com::android::internal::net::IOemNetdEventListener;
 
 namespace android {
 namespace net {
@@ -257,6 +259,12 @@ int FwmarkServer::processClient(SocketClient* client, int* socketFd) {
         }
 
         case FwmarkCommand::SELECT_NETWORK: {
+            android::sp<IOemNetdEventListener> oemNetdEventListener =
+                    OemNetdListener::getListenerInternal()->getOemNetdEventListener();
+            if (oemNetdEventListener != nullptr) {
+                oemNetdEventListener->onBindEvent(command.netId, client->getUid());
+            }
+
             fwmark.netId = command.netId;
             if (command.netId == NETID_UNSET) {
                 fwmark.explicitlySelected = false;

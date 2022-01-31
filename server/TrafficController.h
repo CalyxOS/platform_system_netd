@@ -77,8 +77,6 @@ class TrafficController {
      */
     int deleteTagData(uint32_t tag, uid_t uid, uid_t callingUid) EXCLUDES(mMutex);
 
-    bool getNetworkingAllowedForUid(const uid_t uid);
-
     /*
      * Swap the stats map config from current active stats map to the idle one.
      */
@@ -117,6 +115,9 @@ class TrafficController {
     static const String16 DUMP_KEYWORD;
 
     int toggleUidOwnerMap(ChildChain chain, bool enable) EXCLUDES(mMutex);
+
+    bool getNetworkingAllowedForUid(const uid_t uid, const uint32_t ifIndex)
+            EXCLUDES(mMutex);
 
     static netdutils::StatusOr<std::unique_ptr<NetlinkListenerInterface>> makeSkDestroyListener();
 

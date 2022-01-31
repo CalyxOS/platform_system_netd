@@ -177,7 +177,7 @@ int main() {
         exit(1);
     }
 
-    NetdListener netdl(&gCtls->trafficCtrl);
+    NetdListener netdl(&gCtls->netCtrl);
     if (netdl.startListener()) {
         ALOGE("Unable to start NetdListener (%s)", strerror(errno));
         exit(1);

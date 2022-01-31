@@ -49,6 +49,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "6dd27dbc_7dba0ac2",
+        "filename": "server/NetdListener.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1000002
+      },
+      "writtenOn": "2022-01-31T13:36:10Z",
+      "side": 1,
+      "message": "Normally I see using blocks before namespace. Otherwise, only because the namespace is not correct for it.",
+      "parentUuid": "7f4263a9_3de40543",
+      "range": {
+        "startLine": 25,
+        "startChar": 0,
+        "endLine": 25,
+        "endChar": 39
+      },
+      "revId": "d0b863fc0a235de6dda11173ae1377dc505160d3",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "1a921f00_1a9770a5",
         "filename": "server/OemNetdListener.h",
         "patchSetId": 1

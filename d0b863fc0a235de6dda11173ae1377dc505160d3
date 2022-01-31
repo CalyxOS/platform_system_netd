@@ -164,6 +164,30 @@
       },
       "revId": "d0b863fc0a235de6dda11173ae1377dc505160d3",
       "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b7023ec9_efa91d11",
+        "filename": "server/OemNetdListener.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1000002
+      },
+      "writtenOn": "2022-01-31T13:50:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "500af768_f7cfe8d3",
+      "range": {
+        "startLine": 24,
+        "startChar": 0,
+        "endLine": 24,
+        "endChar": 35
+      },
+      "revId": "d0b863fc0a235de6dda11173ae1377dc505160d3",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
     }
   ]
 }

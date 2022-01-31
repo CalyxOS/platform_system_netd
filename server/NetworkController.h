@@ -100,6 +100,7 @@ public:
     [[nodiscard]] int setDefaultNetwork(unsigned netId);
 
     unsigned getNetworkForUser(uid_t uid) const;
+    bool getNetworkAllowedForUser(uid_t uid, unsigned netId) const;
     unsigned getNetworkForConnect(uid_t uid) const;
     void getNetworkContext(unsigned netId, uid_t uid, struct android_net_context* netcontext) const;
     unsigned getNetworkForInterface(const char* interface) const;

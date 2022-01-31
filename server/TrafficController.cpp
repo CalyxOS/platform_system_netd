@@ -194,6 +194,8 @@ Status TrafficController::initMaps() {
     RETURN_IF_NOT_OK(mConfigurationMap.writeValue(CURRENT_STATS_MAP_CONFIGURATION_KEY, SELECT_MAP_A,
                                                   BPF_ANY));
 
+    RETURN_IF_NOT_OK(
+            mUidIfaceIndexRestrictedMap.init(UID_IFACE_INDEX_RESTRICTED_MAP_PATH));
     RETURN_IF_NOT_OK(mUidOwnerMap.init(UID_OWNER_MAP_PATH));
     RETURN_IF_NOT_OK(mUidOwnerMap.clear());
     RETURN_IF_NOT_OK(mUidPermissionMap.init(UID_PERMISSION_MAP_PATH));
@@ -550,6 +552,24 @@ Status TrafficController::addRule(uint32_t uid, UidOwnerMatchType match, uint32_
     return netdutils::status::ok;
 }
 
+netdutils::Status TrafficController::updateUidInterfaceRestrictedMap(const uid_t uid,
+                                                                     uint32_t ifaceIndex,
+                                                                     bool restricted) {
+    if (ifaceIndex == 0) {
+        return statusFromErrno(EINVAL, StringPrintf("Unknown interface %d", ifaceIndex));
+    }
+    uint64_t key = static_cast<uint64_t>(uid) << 32 | ifaceIndex;
+    if (!restricted) {
+        RETURN_IF_NOT_OK(mUidIfaceIndexRestrictedMap.deleteValue(key));
+    } else {
+        UidIfaceRestrictedValue uidIfaceRestrictedValue;
+        uidIfaceRestrictedValue.restricted = 1;
+        RETURN_IF_NOT_OK(mUidIfaceIndexRestrictedMap.writeValue(key, uidIfaceRestrictedValue,
+                         BPF_ANY));
+    }
+    return netdutils::status::ok;
+}
+
 Status TrafficController::updateUidOwnerMap(const std::vector<uint32_t>& appUids,
                                             UidOwnerMatchType matchType,
                                             BandwidthController::IptOp op) {
@@ -565,6 +585,25 @@ Status TrafficController::updateUidOwnerMap(const std::vector<uint32_t>& appUids
         }
     }
     return netdutils::status::ok;
+}
+
+int TrafficController::updateRestrictedInterface(const uid_t uid, uint32_t ifaceIndex,
+                                                 bool restricted) {
+    UidIfaceRestrictedValue uidIfaceRestrictedValue;
+    if (ifaceIndex == 0) {
+        ALOGE("Unknown interface %d", ifaceIndex);
+        return -1;
+    }
+
+    uint64_t key = static_cast<uint64_t>(uid) << 32 | ifaceIndex;
+    uidIfaceRestrictedValue.restricted = static_cast<uint8_t>(restricted);
+    Status res = mUidIfaceIndexRestrictedMap.writeValue(key, uidIfaceRestrictedValue, BPF_ANY);
+    if (!isOk(res)) {
+        ALOGE("Failed to update restricted iface %d for uid %d: %s", ifaceIndex, uid,
+              strerror(res.code()));
+        return -res.code();
+    }
+    return 0;
 }
 
 int TrafficController::changeUidOwnerRule(ChildChain chain, uid_t uid, FirewallRule rule,
@@ -708,7 +747,8 @@ int TrafficController::toggleUidOwnerMap(ChildChain chain, bool enable) {
     return -res.code();
 }
 
-bool TrafficController::getNetworkingAllowedForUid(const uid_t uid) {
+bool TrafficController::getNetworkingAllowedForUid(const uid_t uid,
+                                                   const std::vector<uint32_t>& ifIndexes) {
     std::lock_guard guard(mMutex);
     uint32_t key = UID_RULES_CONFIGURATION_KEY;
     auto configuration = mConfigurationMap.readValue(key);
@@ -717,17 +757,22 @@ bool TrafficController::getNetworkingAllowedForUid(const uid_t uid) {
             configuration.error().message().c_str());
         return true;
     }
-    // If the restricted firewall chain is disabled, networking is allowed
-    if (!(configuration.value() & RESTRICTED_MATCH)) {
-        return true;
-    }
-    // If the uid owner map does not contain the uid, networking is disallowed
     auto uidOwnerValue = mUidOwnerMap.readValue(uid);
     if (!uidOwnerValue.ok()) {
         return false;
     }
-    // Otherwise, networking is allowed if the uid is allowlisted
-    return uidOwnerValue.value().rule & RESTRICTED_MATCH;
+    auto rule = uidOwnerValue.value().rule;
+    if ((configuration.value() & RESTRICTED_MATCH) && ((rule & RESTRICTED_MATCH) == 0)) {
+        return false;
+    }
+    for (const auto& ifIndex : ifIndexes) {
+        uint64_t key = static_cast<uint64_t>(uid) << 32 | ifIndex;
+        auto uidIfaceRestrictedValue = mUidIfaceIndexRestrictedMap.readValue(key);
+        if (uidIfaceRestrictedValue.ok() && uidIfaceRestrictedValue.value().restricted) {
+            return false;
+        }
+    }
+    return true;
 }
 
 Status TrafficController::swapActiveStatsMap() {
@@ -865,6 +910,9 @@ void TrafficController::dump(DumpWriter& dw, bool verbose) {
                getMapStatus(mIfaceStatsMap.getMap(), IFACE_STATS_MAP_PATH).c_str());
     dw.println("mConfigurationMap status: %s",
                getMapStatus(mConfigurationMap.getMap(), CONFIGURATION_MAP_PATH).c_str());
+    dw.println("mUidIfaceIndexRestrictedMap status: %s",
+               getMapStatus(mUidIfaceIndexRestrictedMap.getMap(),
+                            UID_IFACE_INDEX_RESTRICTED_MAP_PATH).c_str());
     dw.println("mUidOwnerMap status: %s",
                getMapStatus(mUidOwnerMap.getMap(), UID_OWNER_MAP_PATH).c_str());
 

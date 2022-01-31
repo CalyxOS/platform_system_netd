@@ -263,6 +263,9 @@ int FwmarkServer::processClient(SocketClient* client, int* socketFd) {
                 fwmark.protectedFromVpn = false;
                 permission = PERMISSION_NONE;
             } else {
+                if (!mNetworkController->getNetworkAllowedForUser(uid, netId)) {
+                    return -1;
+                }
                 if (int ret = mNetworkController->checkUserNetworkAccess(client->getUid(),
                                                                          command.netId)) {
                     return ret;

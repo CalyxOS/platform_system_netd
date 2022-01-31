@@ -41,7 +41,7 @@ bool Network::hasInterface(const std::string& interface) const {
     return mInterfaces.find(interface) != mInterfaces.end();
 }
 
-const std::set<std::string>& Network::getInterfaces() const {
+const std::unordered_set<std::string>& Network::getInterfaces() const {
     return mInterfaces;
 }
 

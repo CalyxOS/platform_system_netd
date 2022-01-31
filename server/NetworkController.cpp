@@ -39,6 +39,7 @@
 #include "OffloadUtils.h"
 #include "PhysicalNetwork.h"
 #include "RouteController.h"
+#include "TrafficController.h"
 #include "UnreachableNetwork.h"
 #include "VirtualNetwork.h"
 #include "netdutils/DumpWriter.h"
@@ -269,6 +270,25 @@ unsigned NetworkController::getNetworkForUser(uid_t uid) const {
     return mDefaultNetId;
 }
 
+bool NetworkController::getNetworkAllowedForUser(uid_t uid, unsigned netId) const {
+    ScopedRLock lock(mRWLock);
+    Network* network = nullptr;
+    if (netId != NETID_UNSET) {
+        network = getNetworkLocked(netId);
+    } else if (mDefaultNetId != NETID_UNSET) {
+        network = getNetworkLocked(mDefaultNetId);
+    }
+    if (network) {
+        std::vector<uint32_t> ifIndexes;
+        const auto& interfaces = network->getInterfaces();
+        ifIndexes.reserve(interfaces.size());
+        for (const auto& interface : interfaces) {
+            ifIndexes.push_back(RouteController::getIfIndex(interface.c_str()));
+        }
+        return android::net::gCtls->trafficCtrl.getNetworkingAllowedForUid(uid, ifIndexes);
+    }
+    return false;
+}
 // Returns the NetId that will be set when a socket connect()s. This is the bypassable VPN that
 // applies to the user if any; otherwise, the default network that applies to user if any; lastly,
 // the default network.

@@ -24,6 +24,30 @@
       "serverId": "35266860-6252-469c-a67d-185064479fc0"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8ee5d3db_7f2a5b07",
+        "filename": "server/Android.bp",
+        "patchSetId": 1
+      },
+      "lineNbr": 167,
+      "author": {
+        "id": 1000002
+      },
+      "writtenOn": "2022-01-31T13:38:19Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "bf7de5e4_c447e72a",
+      "range": {
+        "startLine": 165,
+        "startChar": 0,
+        "endLine": 167,
+        "endChar": 10
+      },
+      "revId": "d0b863fc0a235de6dda11173ae1377dc505160d3",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7f4263a9_3de40543",
@@ -84,6 +108,30 @@
       "writtenOn": "2022-01-31T13:32:15Z",
       "side": 1,
       "message": "move to cpp?",
+      "range": {
+        "startLine": 24,
+        "startChar": 0,
+        "endLine": 24,
+        "endChar": 35
+      },
+      "revId": "d0b863fc0a235de6dda11173ae1377dc505160d3",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c7577ba2_b36bcdb2",
+        "filename": "server/OemNetdListener.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1000002
+      },
+      "writtenOn": "2022-01-31T13:38:19Z",
+      "side": 1,
+      "message": "This was copied from NetdNativeService.h",
+      "parentUuid": "1a921f00_1a9770a5",
       "range": {
         "startLine": 24,
         "startChar": 0,

@@ -21,6 +21,7 @@
 #include <mutex>
 
 #include <android-base/thread_annotations.h>
+#include <binder/IServiceManager.h>
 #include "com/android/internal/net/BnOemNetd.h"
 #include "com/android/internal/net/IOemNetdUnsolicitedEventListener.h"
 
@@ -41,6 +42,11 @@ class OemNetdListener : public BnOemNetd {
     ::android::binder::Status isAlive(bool* alive) override;
     ::android::binder::Status registerOemUnsolicitedEventListener(
             const ::android::sp<IOemNetdUnsolicitedEventListener>& listener) override;
+
+    // Traffic commands
+    ::android::binder::Status trafficSetRestrictedInterfaceForUid(int32_t uid,
+                                                                  const std::string& ifName,
+                                                                  bool restricted);
 
   private:
     std::mutex mOemUnsolicitedMutex;

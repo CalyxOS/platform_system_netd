@@ -20,16 +20,14 @@
 #include <sysutils/FrameworkListener.h>
 
 #include "NetdCommand.h"
-#include "TrafficController.h"
+#include "NetworkController.h"
 
 namespace android {
 namespace net {
 
-class TrafficController;
-
 class NetdListener : public FrameworkListener {
 public:
-    explicit NetdListener(TrafficController* trafficCtrl);
+    explicit NetdListener(NetworkController* netCtrl);
     virtual ~NetdListener() {}
 
     static constexpr const char* SOCKET_NAME = "netdl";
@@ -37,12 +35,12 @@ public:
 private:
     class Handler : public NetdCommand {
     public:
-        Handler(TrafficController* trafficCtrl);
+        Handler(NetworkController* netCtrl);
         virtual ~Handler();
         int runCommand(SocketClient *c, int argc, char** argv) override;
 
     private:
-        TrafficController* mTrafficCtrl;
+        NetworkController* mNetCtrl;
     };
 };
 

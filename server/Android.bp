@@ -233,6 +233,7 @@ cc_library_static {
         "libsysutils",
         "netd_aidl_interface-V7-cpp",
         "netd_event_listener_interface-V1-cpp",
+        "oemnetd_aidl_interface-cpp",
     ],
     aidl: {
         export_aidl_headers: true,

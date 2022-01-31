@@ -19,7 +19,7 @@
 #include "NetdConstants.h"
 #include "UidRanges.h"
 
-#include <set>
+#include <unordered_set>
 #include <string>
 
 namespace android::net {
@@ -38,7 +38,7 @@ public:
     unsigned getNetId() const;
 
     bool hasInterface(const std::string& interface) const;
-    const std::set<std::string>& getInterfaces() const;
+    const std::unordered_set<std::string>& getInterfaces() const;
 
     // These return 0 on success or negative errno on failure.
     [[nodiscard]] virtual int addInterface(const std::string&) { return -EINVAL; }
@@ -68,7 +68,7 @@ protected:
     bool canAddUidRanges(const UidRanges& uidRanges, uint32_t subPriority) const;
 
     const unsigned mNetId;
-    std::set<std::string> mInterfaces;
+    std::unordered_set<std::string> mInterfaces;
     // Each subsidiary priority maps to a set of UID ranges of a feature.
     std::map<uint32_t, UidRanges> mUidRangeMap;
     const bool mSecure;

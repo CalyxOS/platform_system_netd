@@ -38,6 +38,7 @@
 #include "FwmarkClient.h"
 #include "FwmarkCommand.h"
 #include "netdclient_priv.h"
+#include "netdutils/UidConstants.h"
 #include "netdutils/ResponseCode.h"
 #include "netdutils/Stopwatch.h"
 #include "netid_client.h"
@@ -67,7 +68,7 @@ typedef int (*Accept4FunctionType)(int, sockaddr*, socklen_t*, int);
 typedef int (*ConnectFunctionType)(int, const sockaddr*, socklen_t);
 typedef int (*SocketFunctionType)(int, int, int);
 typedef unsigned (*NetIdForResolvFunctionType)(unsigned);
-typedef int (*DnsOpenProxyType)();
+typedef int (*DnsOpenProxyType)(unsigned);
 typedef int (*SendmmsgFunctionType)(int, const mmsghdr*, unsigned int, int);
 typedef ssize_t (*SendmsgFunctionType)(int, const msghdr*, unsigned int);
 typedef int (*SendtoFunctionType)(int, const void*, size_t, int, const sockaddr*, socklen_t);
@@ -82,7 +83,11 @@ SendmsgFunctionType libcSendmsg = nullptr;
 SendtoFunctionType libcSendto = nullptr;
 
 // Check if current process should be allowed to use networks according to UID rules.
-bool getNetworkingAllowedForProcess();
+bool getNetworkingAllowedForProcess(unsigned netId);
+
+static __always_inline int is_system_uid(uint32_t uid) {
+    return (uid <= MAX_SYSTEM_UID) && (uid >= MIN_SYSTEM_UID);
+}
 
 static bool propertyValueIsTrue(const char* prop_name) {
     char prop_value[PROP_VALUE_MAX] = {0};
@@ -220,14 +225,14 @@ int netdClientSocket(int domain, int type, int protocol) {
         errno = EPERM;
         return -1;
     }
-    if (FwmarkCommand::isSupportedFamily(domain) && !getNetworkingAllowedForProcess()) {
+    unsigned netId = netIdForProcess & ~NETID_USE_LOCAL_NAMESERVERS;
+    if (FwmarkCommand::isSupportedFamily(domain) && !getNetworkingAllowedForProcess(netId)) {
         return -1;
     }
     int socketFd = libcSocket(domain, type, protocol);
     if (socketFd == -1) {
         return -1;
     }
-    unsigned netId = netIdForProcess & ~NETID_USE_LOCAL_NAMESERVERS;
     if (netId != NETID_UNSET && FwmarkClient::shouldSetFwmark(domain)) {
         if (int error = setNetworkForSocket(netId, socketFd)) {
             return closeFdAndSetErrno(socketFd, error);
@@ -318,7 +323,7 @@ int setNetworkForTarget(unsigned netId, std::atomic_uint* target) {
     return error;
 }
 
-int dns_open_proxy() {
+int dns_open_proxy(unsigned netId) {
     const char* cache_mode = getenv("ANDROID_DNS_MODE");
     const bool use_proxy = (cache_mode == NULL || strcmp(cache_mode, "local") != 0);
     if (!use_proxy) {
@@ -334,7 +339,7 @@ int dns_open_proxy() {
         return -1;
     }
 
-    if (!getNetworkingAllowedForProcess()) {
+    if (!getNetworkingAllowedForProcess(netId)) {
         return -1;
     }
 
@@ -416,17 +421,18 @@ bool readResponseCode(int fd, int* result) {
     return true;
 }
 
-// Default to true for root UID (because the value is not set by Zygote during boot) and
+// Default to true for system UIDs (note that the value is not set by Zygote during boot) and
 // in case of errors obtaining the status from TrafficController
-bool getNetworkingAllowedForProcess() {
-    if (uidForProcess.load() == 0) {
+bool getNetworkingAllowedForProcess(unsigned netId) {
+    if (is_system_uid(uidForProcess.load())) {
         return true;
     }
     int fd = netdClientSocket();
     if (fd == -1) {
         return true;
     }
-    const std::string cmd = "netd traffic getuidnetworking " + std::to_string(uidForProcess.load());
+    const std::string cmd = "netd network getuidnetworking " + std::to_string(uidForProcess.load())
+                            + " " + std::to_string(netId);
     if (cmd.size() > MAX_CMD_SIZE) {
         // Cmd size must be less than buffer size of FrameworkListener
         close(fd);
@@ -607,7 +613,7 @@ extern "C" int resNetworkSend(unsigned netId, const uint8_t* msg, size_t msglen,
         // Cmd size must less than buffer size of FrameworkListener
         return -EMSGSIZE;
     }
-    int fd = dns_open_proxy();
+    int fd = dns_open_proxy(netId);
     if (fd == -1) {
         return -errno;
     }
@@ -664,7 +670,7 @@ extern "C" void setAllowNetworkingForProcess(int uid, bool allowNetworking) {
 
 extern "C" int getNetworkForDns(unsigned* dnsNetId) {
     if (dnsNetId == nullptr) return -EFAULT;
-    int fd = dns_open_proxy();
+    int fd = dns_open_proxy(*dnsNetId);
     if (fd == -1) {
         return -errno;
     }

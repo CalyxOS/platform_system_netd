@@ -728,26 +728,29 @@ int TrafficController::toggleUidOwnerMap(ChildChain chain, bool enable) {
     return -res.code();
 }
 
-bool TrafficController::getNetworkingAllowedForUid(const uid_t uid) {
+bool TrafficController::getNetworkingAllowedForUid(const uid_t uid,
+                                                   const uint32_t ifIndex) {
     std::lock_guard guard(mMutex);
-    uint32_t key = UID_RULES_CONFIGURATION_KEY;
-    auto configuration = mConfigurationMap.readValue(key);
+    auto configuration = mConfigurationMap.readValue(UID_RULES_CONFIGURATION_KEY);
     if (!configuration.ok()) {
         ALOGE("Cannot read the configuration from map: %s",
             configuration.error().message().c_str());
         return true;
     }
-    // If the restricted firewall chain is disabled, networking is allowed
-    if (!(configuration.value() & RESTRICTED_MATCH)) {
-        return true;
-    }
-    // If the uid owner map does not contain the uid, networking is disallowed
     auto uidOwnerValue = mUidOwnerMap.readValue(uid);
     if (!uidOwnerValue.ok()) {
         return false;
     }
-    // Otherwise, networking is allowed if the uid is allowlisted
-    return uidOwnerValue.value().rule & RESTRICTED_MATCH;
+    auto rule = uidOwnerValue.value().rule;
+    if ((configuration.value() & RESTRICTED_MATCH) && !(rule & RESTRICTED_MATCH)) {
+        return false;
+    }
+    uint64_t key = static_cast<uint64_t>(uid) << 32 | ifIndex;
+    auto uidIfaceRestrictedValue = mUidIfaceIndexRestrictedMap.readValue(key);
+    if (uidIfaceRestrictedValue.ok() && uidIfaceRestrictedValue.value().restricted) {
+        return false;
+    }
+    return true;
 }
 
 Status TrafficController::swapActiveStatsMap() {

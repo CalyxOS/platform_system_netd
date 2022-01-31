@@ -20,7 +20,7 @@
 int getNetworkForDnsInternal(int fd, unsigned* dnsNetId);
 
 extern "C" {
-void netdClientInitDnsOpenProxy(int (**DnsOpenProxyType)());
+void netdClientInitDnsOpenProxy(int (**DnsOpenProxyType)(unsigned));
 void netdClientInitSocket(int (**SocketFunctionType)(int, int, int));
 }
 

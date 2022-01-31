@@ -38,6 +38,7 @@
 #include "FwmarkClient.h"
 #include "FwmarkCommand.h"
 #include "netdclient_priv.h"
+#include "netdutils/UidConstants.h"
 #include "netdutils/ResponseCode.h"
 #include "netdutils/Stopwatch.h"
 #include "netid_client.h"
@@ -82,7 +83,11 @@ SendmsgFunctionType libcSendmsg = nullptr;
 SendtoFunctionType libcSendto = nullptr;
 
 // Check if current process should be allowed to use networks according to UID rules.
-bool getNetworkingAllowedForProcess();
+bool getNetworkingAllowedForProcess(unsigned netId);
+
+static __always_inline int is_system_uid(uint32_t uid) {
+    return (uid <= MAX_SYSTEM_UID) && (uid >= MIN_SYSTEM_UID);
+}
 
 static bool propertyValueIsTrue(const char* prop_name) {
     char prop_value[PROP_VALUE_MAX] = {0};
@@ -220,14 +225,14 @@ int netdClientSocket(int domain, int type, int protocol) {
         errno = EPERM;
         return -1;
     }
-    if (FwmarkCommand::isSupportedFamily(domain) && !getNetworkingAllowedForProcess()) {
+    unsigned netId = netIdForProcess & ~NETID_USE_LOCAL_NAMESERVERS;
+    if (FwmarkCommand::isSupportedFamily(domain) && !getNetworkingAllowedForProcess(netId)) {
         return -1;
     }
     int socketFd = libcSocket(domain, type, protocol);
     if (socketFd == -1) {
         return -1;
     }
-    unsigned netId = netIdForProcess & ~NETID_USE_LOCAL_NAMESERVERS;
     if (netId != NETID_UNSET && FwmarkClient::shouldSetFwmark(domain)) {
         if (int error = setNetworkForSocket(netId, socketFd)) {
             return closeFdAndSetErrno(socketFd, error);
@@ -334,10 +339,6 @@ int dns_open_proxy() {
         return -1;
     }
 
-    if (!getNetworkingAllowedForProcess()) {
-        return -1;
-    }
-
     static const struct sockaddr_un proxy_addr = {
             .sun_family = AF_UNIX,
             .sun_path = "/dev/socket/dnsproxyd",
@@ -416,17 +417,18 @@ bool readResponseCode(int fd, int* result) {
     return true;
 }
 
-// Default to true for root UID (because the value is not set by Zygote during boot) and
+// Default to true for system UIDs (note that the value is not set by Zygote during boot) and
 // in case of errors obtaining the status from TrafficController
-bool getNetworkingAllowedForProcess() {
-    if (uidForProcess.load() == 0) {
+bool getNetworkingAllowedForProcess(unsigned netId) {
+    if (is_system_uid(uidForProcess.load())) {
         return true;
     }
     int fd = netdClientSocket();
     if (fd == -1) {
         return true;
     }
-    const std::string cmd = "netd traffic getuidnetworking " + std::to_string(uidForProcess.load());
+    const std::string cmd = "netd network getuidnetworking " + std::to_string(uidForProcess.load())
+                            + " " + std::to_string(netId);
     if (cmd.size() > MAX_CMD_SIZE) {
         // Cmd size must be less than buffer size of FrameworkListener
         close(fd);
@@ -525,6 +527,9 @@ extern "C" unsigned getNetworkForProcess() {
 }
 
 extern "C" int setNetworkForSocket(unsigned netId, int socketFd) {
+    if (!getNetworkingAllowedForProcess(netId)) {
+        return -1;
+    }
     CHECK_SOCKET_IS_MARKABLE(socketFd);
     FwmarkCommand command = {FwmarkCommand::SELECT_NETWORK, netId, 0, 0};
     return FwmarkClient().send(&command, socketFd, nullptr);
@@ -601,6 +606,11 @@ extern "C" int resNetworkSend(unsigned netId, const uint8_t* msg, size_t msglen,
     }
     // Send
     netId = getNetworkForResolv(netId);
+
+    if (!getNetworkingAllowedForProcess(netId)) {
+        return -errno;
+    }
+
     const std::string cmd = "resnsend " + std::to_string(netId) + " " + std::to_string(flags) +
                             " " + encodedQuery + '\0';
     if (cmd.size() > MAX_CMD_SIZE) {
@@ -678,6 +688,10 @@ int getNetworkForDnsInternal(int fd, unsigned* dnsNetId) {
     }
 
     unsigned resolvNetId = getNetworkForResolv(NETID_UNSET);
+
+    if (!getNetworkingAllowedForProcess(resolvNetId)) {
+        return -errno;
+    }
 
     const std::string cmd = "getdnsnetid " + std::to_string(resolvNetId);
     ssize_t rc = sendData(fd, cmd.c_str(), cmd.size() + 1);

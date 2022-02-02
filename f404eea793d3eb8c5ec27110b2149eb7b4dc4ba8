@@ -16,6 +16,24 @@
       "message": "I think this is a problem unfortunately. In java the network to interface mapping is one to one. In netd, it\u0027s one to many (stacked interfaces e.g. virtual network with VPN interface and WiFi physical interface) which could match something when we don\u0027t care about the other possible interfaces",
       "revId": "f404eea793d3eb8c5ec27110b2149eb7b4dc4ba8",
       "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ae57b09f_4310cb5d",
+        "filename": "server/TrafficController.cpp",
+        "patchSetId": 8
+      },
+      "lineNbr": 749,
+      "author": {
+        "id": 1000002
+      },
+      "writtenOn": "2022-02-02T17:45:54Z",
+      "side": 1,
+      "message": "`adb shell dumpsys netd` seems to indicate only one interface in a virtual network",
+      "parentUuid": "43a7e5fc_eb77decd",
+      "revId": "f404eea793d3eb8c5ec27110b2149eb7b4dc4ba8",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
     }
   ]
 }

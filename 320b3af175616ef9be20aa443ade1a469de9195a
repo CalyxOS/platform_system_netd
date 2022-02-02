@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d96f603e_d9fe85f5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 12
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000002
+      },
+      "writtenOn": "2022-02-02T22:59:54Z",
+      "side": 1,
+      "message": "As much as possible we should ensure the sockets we block from being created are IF_NET",
+      "revId": "320b3af175616ef9be20aa443ade1a469de9195a",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    }
+  ]
+}

@@ -16,6 +16,23 @@
       "message": "As much as possible we should ensure the sockets we block from being created are IF_NET",
       "revId": "320b3af175616ef9be20aa443ade1a469de9195a",
       "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f39cda3e_26abe956",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 12
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2022-02-04T19:23:02Z",
+      "side": 1,
+      "message": "I\u0027d split this up when done / before merging tbh.\n\nMaybe even revert netdl, apply this, then re-apply that with any changes needed so that it remains in sync.",
+      "revId": "320b3af175616ef9be20aa443ade1a469de9195a",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
     }
   ]
 }

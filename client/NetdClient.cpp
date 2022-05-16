@@ -40,6 +40,7 @@
 #include "netdclient_priv.h"
 #include "netdutils/ResponseCode.h"
 #include "netdutils/Stopwatch.h"
+#include "netdutils/UidConstants.h"
 #include "netid_client.h"
 
 using android::base::ParseInt;
@@ -83,6 +84,10 @@ SendtoFunctionType libcSendto = nullptr;
 
 // Check if current process should be allowed to use networks according to UID rules.
 bool getNetworkingAllowedForProcess();
+
+static __always_inline int is_system_uid(uint32_t uid) {
+    return (uid <= MAX_SYSTEM_UID) && (uid >= MIN_SYSTEM_UID);
+}
 
 static bool propertyValueIsTrue(const char* prop_name) {
     char prop_value[PROP_VALUE_MAX] = {0};
@@ -419,7 +424,7 @@ bool readResponseCode(int fd, int* result) {
 // Default to true for root UID (because the value is not set by Zygote during boot) and
 // in case of errors obtaining the status from TrafficController
 bool getNetworkingAllowedForProcess() {
-    if (uidForProcess.load() == 0) {
+    if (is_system_uid(uidForProcess.load())) {
         return true;
     }
     int fd = netdClientSocket();

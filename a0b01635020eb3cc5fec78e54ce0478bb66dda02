@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3d2e16ba_9d10726a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000062
+      },
+      "writtenOn": "2022-08-21T19:19:36Z",
+      "side": 1,
+      "message": "It builds and runs, and it boots successfully in an emulator, but it has not been verified. See also https://review.calyxos.org/c/CalyxOS/platform_packages_modules_Connectivity/+/12838",
+      "revId": "a0b01635020eb3cc5fec78e54ce0478bb66dda02",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    }
+  ]
+}

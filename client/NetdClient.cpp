@@ -185,7 +185,7 @@ int netdClientConnect(int sockfd, const sockaddr* addr, socklen_t addrlen) {
 int netdClientSocket(int domain, int type, int protocol) {
     // Block creating AF_INET/AF_INET6 socket if networking is not allowed.
     if (FwmarkCommand::isSupportedFamily(domain) && !allowNetworkingForProcess.load()) {
-        errno = EPERM;
+        errno = ECONNREFUSED;
         return -1;
     }
     int socketFd = libcSocket(domain, type, protocol);
@@ -293,9 +293,9 @@ int dns_open_proxy() {
 
     // If networking is not allowed, dns_open_proxy should just fail here.
     // Then eventually, the DNS related functions in local mode will get
-    // EPERM while creating socket.
+    // ECONNREFUSED while creating socket.
     if (!allowNetworkingForProcess.load()) {
-        errno = EPERM;
+        errno = ECONNREFUSED;
         return -1;
     }
     const auto socketFunc = libcSocket ? libcSocket : socket;

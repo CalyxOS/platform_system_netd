@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8f4e1dc0_d0bd8157",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2022-09-12T12:19:43Z",
+      "side": 1,
+      "message": "LGTM.\n\nAny potential for side effects here?",
+      "revId": "a5f1b87de69b6e1dcdb4fb3cbeebc29e387d694d",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    }
+  ]
+}

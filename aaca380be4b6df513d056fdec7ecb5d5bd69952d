@@ -16,6 +16,24 @@
       "message": "Should we just abandon this?",
       "revId": "aaca380be4b6df513d056fdec7ecb5d5bd69952d",
       "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5f34b9eb_baaf66af",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000002
+      },
+      "writtenOn": "2022-09-12T17:15:59Z",
+      "side": 1,
+      "message": "If we\u0027re for sure not going with the modified patches tmw ported then I think that\u0027s fine",
+      "parentUuid": "ccfc68ef_57cb17e0",
+      "revId": "aaca380be4b6df513d056fdec7ecb5d5bd69952d",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
     }
   ]
 }

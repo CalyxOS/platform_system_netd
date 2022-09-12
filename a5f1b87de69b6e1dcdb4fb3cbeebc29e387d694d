@@ -16,6 +16,24 @@
       "message": "LGTM.\n\nAny potential for side effects here?",
       "revId": "a5f1b87de69b6e1dcdb4fb3cbeebc29e387d694d",
       "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c39b2a3b_df2aef5d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000002
+      },
+      "writtenOn": "2022-09-12T16:30:49Z",
+      "side": 1,
+      "message": "If there is code elsewhere that depends on these error codes specifically to execute particular stuff that isn\u0027t with the removal of EPERM here then potentially. In practice I have not noticed this. We did not return them in the previous implementation. The difference now is that we make use of the AOSP variable rather than querying TrafficController about the restrction status of a UID for each call.\nWe could trace back these functions and see what they do with error codes. -1 return ensures the sockets are not opened.\nhttps://cs.android.com/android/platform/superproject/+/master:system/netd/client/NetdClient.cpp;l\u003d423;drc\u003d1b81da79ce8732cdd5e2900022bc6aed4041ad2b",
+      "parentUuid": "8f4e1dc0_d0bd8157",
+      "revId": "a5f1b87de69b6e1dcdb4fb3cbeebc29e387d694d",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
     }
   ]
 }

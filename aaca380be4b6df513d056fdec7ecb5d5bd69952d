@@ -52,6 +52,24 @@
       "parentUuid": "5f34b9eb_baaf66af",
       "revId": "aaca380be4b6df513d056fdec7ecb5d5bd69952d",
       "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6998639e_4253dcf5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000002
+      },
+      "writtenOn": "2022-09-12T17:27:28Z",
+      "side": 1,
+      "message": "Yeah, this would not be required with the new patches.",
+      "parentUuid": "4c51c68d_2863723e",
+      "revId": "aaca380be4b6df513d056fdec7ecb5d5bd69952d",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
     }
   ]
 }

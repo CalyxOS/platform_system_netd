@@ -17,6 +17,7 @@
 #include "NetdClient.h"
 
 #include <arpa/inet.h>
+#include <cutils/misc.h>           // FIRST_APPLICATION_UID
 #include <errno.h>
 #include <math.h>
 #include <resolv.h>
@@ -27,12 +28,16 @@
 #include <unistd.h>
 
 #include <atomic>
+#include <random>
 #include <string>
 #include <vector>
 
 #include <DnsProxydProtocol.h>  // NETID_USE_LOCAL_NAMESERVERS
 #include <android-base/parseint.h>
 #include <android-base/unique_fd.h>
+
+#define LOG_TAG "NetdClient"
+#include <log/log.h>
 
 #include "Fwmark.h"
 #include "FwmarkClient.h"
@@ -70,6 +75,10 @@ typedef int (*DnsOpenProxyType)();
 typedef int (*SendmmsgFunctionType)(int, const mmsghdr*, unsigned int, int);
 typedef ssize_t (*SendmsgFunctionType)(int, const msghdr*, unsigned int);
 typedef int (*SendtoFunctionType)(int, const void*, size_t, int, const sockaddr*, socklen_t);
+typedef int (*BindFunctionType)(int, const sockaddr*, socklen_t);
+typedef int (*GetsocknameFunctionType)(int, sockaddr*, socklen_t*);
+typedef int (*GetpeernameFunctionType)(int, sockaddr*, socklen_t*);
+typedef ssize_t (*RecvfromFunctionType)(int, void*, size_t len, int flags, sockaddr*, socklen_t*);
 
 // These variables are only modified at startup (when libc.so is loaded) and never afterwards, so
 // it's okay that they are read later at runtime without a lock.
@@ -79,6 +88,10 @@ SocketFunctionType libcSocket = nullptr;
 SendmmsgFunctionType libcSendmmsg = nullptr;
 SendmsgFunctionType libcSendmsg = nullptr;
 SendtoFunctionType libcSendto = nullptr;
+BindFunctionType libcBind = nullptr;
+GetsocknameFunctionType libcGetsockname = nullptr;
+GetpeernameFunctionType libcGetpeername = nullptr;
+RecvfromFunctionType libcRecvfrom = nullptr;
 
 static bool propertyValueIsTrue(const char* prop_name) {
     char prop_value[PROP_VALUE_MAX] = {0};
@@ -123,6 +136,122 @@ int closeFdAndSetErrno(int fd, int error) {
     return -1;
 }
 
+void fillRandomChars(char* dest, size_t n) {
+    static const char charset[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    std::random_device rd;
+    std::default_random_engine e(rd());
+    std::uniform_int_distribution<> dist(0, sizeof(charset));
+    for (size_t i = 0; i < n; ++i) {
+        dest[i] = charset[dist(e)];
+    }
+}
+
+void randomizeAbstractSockaddr(sockaddr_un* addr, size_t start, socklen_t* paddrlen) {
+    addr->sun_path[0] = '\0';
+
+    size_t maxlen = sizeof(sockaddr_un) - sizeof(sa_family_t) - 1;
+
+    // +1 to skip leading null byte
+    if (start + 1 <= maxlen) {
+        fillRandomChars(&addr->sun_path[1 + start], maxlen - start);
+        *paddrlen = sizeof(sockaddr_un);
+    }
+}
+
+bool userIsSystem(uid_t uid) {
+    return uid < FIRST_APPLICATION_UID;
+}
+bool userIsSystem() {
+    return getuid() < FIRST_APPLICATION_UID;
+}
+
+bool isSockaddrAbstract(const sockaddr* addr, socklen_t addrlen) {
+    if ((addr != nullptr) && (addr->sa_family == AF_UNIX)) {
+        // Is it an abstract socket? sun_path must be >1 bytes and must start with '\0'
+        if (((size_t)addrlen > (sizeof(sa_family_t) + 1))
+                && ((sockaddr_un*)addr)->sun_path[0] == '\0') {
+            return true;
+        }
+    }
+    return false;
+}
+
+const char* getAllowedGlobalPrefixIfAny(const sockaddr_un* addr, socklen_t addrlen) {
+    std::string_view name(&addr->sun_path[1], addrlen - sizeof(sa_family_t) - 1);
+    if (name.starts_with(ZYGOTE_APP_PREFIX)) {
+        return ZYGOTE_APP_PREFIX;
+    } else if (name.starts_with(ZYGOTE_WEBVIEW_PREFIX)) {
+        return ZYGOTE_WEBVIEW_PREFIX;
+    }
+    return nullptr;
+/*    size_t len = addrlen - sizeof(sa_family_t) - 1;
+    if ((len >= sizeof(ZYGOTE_APP_PREFIX)-1) && memcmp(ZYGOTE_APP_PREFIX,
+            &addr->sun_path[1], sizeof(ZYGOTE_APP_PREFIX)-1) == 0) {
+        return ZYGOTE_APP_PREFIX;
+    } else if ((len >= sizeof(ZYGOTE_WEBVIEW_PREFIX)-1) && memcmp(ZYGOTE_WEBVIEW_PREFIX,
+            &addr->sun_path[1], sizeof(ZYGOTE_WEBVIEW_PREFIX)-1) == 0) {
+        return ZYGOTE_WEBVIEW_PREFIX;
+    }
+    return nullptr;*/
+}
+
+void logAbstractSockaddr(const char* str, const sockaddr_un* sa_un, socklen_t addrlen) {
+    std::string name(&sa_un->sun_path[1], addrlen - sizeof(sa_family_t) - 1);
+    ALOGE("%s: %u: '%s'", str, getuid(), name.c_str());
+}
+
+int isolateAbstractSockaddr(const sockaddr_un* addr, socklen_t addrlen,
+        sockaddr_un* sa_un, socklen_t* salen) {
+    int uid = getuid();
+    size_t namelen = addrlen - sizeof(sa_family_t);
+    int prefixlen = 0;
+    sa_un->sun_path[0] = '\0'; // Abstract sockets must start with '\0'
+
+    if (!userIsSystem(uid)) {
+        // Regular user apps get de facto separate namespaces
+        prefixlen = ABSTRACT_SOCKET_NAME_PREFIX_LEN;
+        snprintf(&sa_un->sun_path[1], ABSTRACT_SOCKET_NAME_PREFIX_LEN + 1,
+                ABSTRACT_SOCKET_NAME_PREFIX_FMT, uid);
+    } else {
+        // System apps all share a single de facto namespace separate from user apps
+        //prefixlen = 1;
+        //sa_un->sun_path[1] = ABSTRACT_SOCKET_NAME_SYSTEM_PREFIX;
+        prefixlen = 0;
+    }
+
+    if ((namelen + prefixlen) > sizeof(sa_un->sun_path)) {
+        return -1;
+    }
+
+    // Concatenate the original abstract socket name without a null terminator
+    memcpy(&sa_un->sun_path[1 + prefixlen], &addr->sun_path[1], namelen - 1);
+    *salen = addrlen + prefixlen;
+    return 0;
+}
+
+int reverseIsolateAbstractSockaddr(sockaddr_un* addr, socklen_t* addrlen) {
+    int uid = getuid();
+    size_t namelen = *addrlen - sizeof(sa_family_t);
+    int prefixlen = 0;
+
+    if (!userIsSystem(uid)) {
+        // Regular user apps
+        prefixlen = ABSTRACT_SOCKET_NAME_PREFIX_LEN;
+    } else if (uid != 0) {
+        // System apps
+        //prefixlen = 1;
+        prefixlen = 0;
+    }
+    if ((namelen - prefixlen) <= 0) {
+        return -1;
+    }
+
+    // Remove the prefix from the abstract socket name
+    memmove(&addr->sun_path[1], &addr->sun_path[1 + prefixlen], namelen);
+    *addrlen = *addrlen - prefixlen;
+    return 0;
+}
+
 int netdClientAccept4(int sockfd, sockaddr* addr, socklen_t* addrlen, int flags) {
     int acceptedSocket = libcAccept4(sockfd, addr, addrlen, flags);
     if (acceptedSocket == -1) {
@@ -147,6 +276,23 @@ int netdClientAccept4(int sockfd, sockaddr* addr, socklen_t* addrlen, int flags)
 }
 
 int netdClientConnect(int sockfd, const sockaddr* addr, socklen_t addrlen) {
+    bool isSystem = userIsSystem();
+    bool isAbstract = isSockaddrAbstract(addr, addrlen);
+
+    if (isAbstract) {
+        logAbstractSockaddr("netdClientConnect", (sockaddr_un*)addr, addrlen);
+
+        if (!isSystem) {
+            const char* global_prefix = getAllowedGlobalPrefixIfAny((sockaddr_un*)addr, addrlen);
+
+            // Forbid non-system uids from connecting to the allowed global prefixes
+            if (global_prefix != nullptr) {
+                errno = -EACCES;
+                return -1;
+            }
+        }
+    }
+
     const bool shouldSetFwmark = shouldMarkSocket(sockfd, addr);
     if (shouldSetFwmark) {
         FwmarkCommand command = {FwmarkCommand::ON_CONNECT, 0, 0, 0};
@@ -163,11 +309,32 @@ int netdClientConnect(int sockfd, const sockaddr* addr, socklen_t addrlen) {
             return -1;
         }
     }
+
     // Latency measurement does not include time of sending commands to Fwmark
     Stopwatch s;
-    const int ret = libcConnect(sockfd, addr, addrlen);
+    int ret = libcConnect(sockfd, addr, addrlen);
     // Save errno so it isn't clobbered by sending ON_CONNECT_COMPLETE
-    const int connectErrno = errno;
+    int connectErrno = errno;
+
+    // If we failed to connect to the specified socket, and it is a UNIX abstract socket,
+    // we want to try again in the app's own namespace. We also want to hide the reason for
+    // the failure as EPERM to prevent global socket discovery.
+    if (!isSystem && (ret != 0) /*&& (connectErrno == ECONNREFUSED)*/
+            && isAbstract) {
+        struct sockaddr_un sa_un = {
+                .sun_family = AF_UNIX,
+                .sun_path = "\0",
+        };
+
+        connectErrno = EACCES;
+
+        if (isolateAbstractSockaddr((sockaddr_un*)addr, addrlen, &sa_un, &addrlen) == 0) {
+            logAbstractSockaddr("netdClientConnect isolated", &sa_un, addrlen);
+            ret = libcConnect(sockfd, (sockaddr*)&sa_un, addrlen);
+            connectErrno = errno;
+        }
+    }
+
     const auto latencyMs = static_cast<unsigned>(s.timeTakenUs() / 1000);
     // Send an ON_CONNECT_COMPLETE command that includes sockaddr and connect latency for reporting
     if (shouldSetFwmark) {
@@ -241,6 +408,128 @@ int netdClientSendto(int sockfd, const void* buf, size_t bufsize, int flags, con
         }
     }
     return libcSendto(sockfd, buf, bufsize, flags, addr, addrlen);
+}
+
+int netdClientBind(int sockfd, const sockaddr* addr, socklen_t addrlen) {
+    bool isAbstract = isSockaddrAbstract(addr, addrlen);
+    if (isAbstract) {
+        logAbstractSockaddr("netdClientBind", (sockaddr_un*)addr, addrlen);
+    }
+
+    if (!userIsSystem() && isAbstract) {
+        struct sockaddr_un sa_un = {
+                .sun_family = AF_UNIX,
+                .sun_path = "\0",
+        };
+        socklen_t salen = 0;
+
+        // Allowed global prefixes will never fail a bind from a user app, to prevent
+        // detection. We make sure of this.
+        const char* global_prefix = getAllowedGlobalPrefixIfAny((sockaddr_un*)addr, addrlen);
+
+        if (global_prefix != nullptr) {
+            logAbstractSockaddr("netdClientBind prefix match", (sockaddr_un*)addr, addrlen);
+            int res = libcBind(sockfd, addr, addrlen);
+            ALOGE("netdClientBind: bind called, res %d, errno %d", res, errno);
+
+            if (res != 0) {
+                int prefixlen = strlen(global_prefix);
+                memcpy(&sa_un.sun_path[1], &((sockaddr_un*)addr)->sun_path[1], prefixlen);
+                ALOGE("netdClientBind random...");
+                randomizeAbstractSockaddr(&sa_un, prefixlen, &salen);
+                ALOGE("netdClientBind randomized.");
+                return libcBind(sockfd, (sockaddr*)&sa_un, salen);
+            } else {
+                ALOGE("netdClientBind prefix bind succeed");
+                errno = 0;
+                return 0;
+            }
+        }
+
+        // Because netdClientConnect attempts to connect to a global-namespace socket
+        // *before* trying a uid-namespace socket, the behavior here allows a uid to bind
+        // with a name that it can *know* is used by something else, if the uid is capable
+        // of connecting to the name that it tries to bind to, here. This would be rare.
+        // We don't consider this a problem, but a quirk worth tolerating.
+        if (isolateAbstractSockaddr((sockaddr_un*)addr, addrlen, &sa_un, &salen) == 0) {
+            logAbstractSockaddr("netdClientBind isolated", &sa_un, salen);
+            return libcBind(sockfd, (sockaddr*)&sa_un, salen);
+        } else {
+            errno = -ENAMETOOLONG;
+            return -1;
+        }
+    }
+    return libcBind(sockfd, addr, addrlen);
+}
+
+int callNetdClientGetname(const char* funcname, GetsocknameFunctionType func,
+        int sockfd, sockaddr* addr, socklen_t* paddrlen) {
+    socklen_t initial_size = *paddrlen;
+    int res = func(sockfd, addr, paddrlen);
+    int getnameErrno = errno;
+    bool isAbstract = isSockaddrAbstract((sockaddr*)addr, *paddrlen);
+
+    if (!isAbstract) {
+        errno = getnameErrno;
+        return res;
+    }
+
+    if (res != 0) {
+        errno = getnameErrno;
+        ALOGE("%s: fail: %d %d", funcname, res, errno);
+        return res;
+    }
+
+    sockaddr_un* sa_un = (sockaddr_un*)addr;
+
+    logAbstractSockaddr(funcname, sa_un, *paddrlen);
+
+    if (!userIsSystem()) {
+        const char* global_prefix = getAllowedGlobalPrefixIfAny(sa_un, *paddrlen);
+
+        if (global_prefix != nullptr) {
+            //ALOGE("%s: prefix truncate skip", funcname);
+            //errno = 0;
+            //return 0;
+            // No need to randomize, just truncate after the prefix
+            size_t prefixlen = strlen(global_prefix);
+            // Clean anything after the prefix with A's instead of 0's
+            // (Because of the whole "shouldn't be null-terminated" thing)
+            size_t remainder = initial_size - prefixlen - sizeof(sa_family_t) - 1;
+            if (remainder > 0) {
+                memset(&sa_un->sun_path[prefixlen+1], (int)'A', remainder);
+                *paddrlen = sizeof(sa_family_t) + 1 + prefixlen;
+            }
+            logAbstractSockaddr(funcname, sa_un, *paddrlen);
+            ALOGE("%s: prefix success? %zu %zu", funcname, prefixlen, sizeof(sa_un->sun_path));
+            errno = 0;
+            return 0;
+        }
+
+        if (reverseIsolateAbstractSockaddr(sa_un, paddrlen) != 0) {
+            //logAbstractSockaddr(funcname, &sa_un, salen);
+            ALOGE("%s: reverse isolate fail", funcname);
+            errno = -EACCES;
+            return -1;
+        }
+    }
+    if (isAbstract) {
+        logAbstractSockaddr(funcname, sa_un, *paddrlen);
+    }
+    return res;
+}
+
+int netdClientGetsockname(int sockfd, sockaddr* addr, socklen_t* paddrlen) {
+    return callNetdClientGetname("netdClientGetsockname", libcGetsockname, sockfd, addr, paddrlen);
+}
+
+int netdClientGetpeername(int sockfd, sockaddr* addr, socklen_t* paddrlen) {
+    return callNetdClientGetname("netdClientGetpeername", libcGetpeername, sockfd, addr, paddrlen);
+}
+
+ssize_t netdClientRecvfrom(int sockfd, void* buf, size_t len, int flags, sockaddr* src_addr,
+        socklen_t* src_addr_length) {
+    return libcRecvfrom(sockfd, buf, len, flags, src_addr, src_addr_length);
 }
 
 unsigned getNetworkForResolv(unsigned netId) {
@@ -442,6 +731,22 @@ extern "C" void netdClientInitSendto(SendtoFunctionType* function) {
         return;
     }
     HOOK_ON_FUNC(function, libcSendto, netdClientSendto);
+}
+
+extern "C" void netdClientInitBind(BindFunctionType* function) {
+    HOOK_ON_FUNC(function, libcBind, netdClientBind);
+}
+
+extern "C" void netdClientInitGetsockname(GetsocknameFunctionType* function) {
+    HOOK_ON_FUNC(function, libcGetsockname, netdClientGetsockname);
+}
+
+extern "C" void netdClientInitGetpeername(GetpeernameFunctionType* function) {
+    HOOK_ON_FUNC(function, libcGetpeername, netdClientGetpeername);
+}
+
+extern "C" void netdClientInitRecvfrom(RecvfromFunctionType* function) {
+    HOOK_ON_FUNC(function, libcRecvfrom, netdClientRecvfrom);
 }
 
 extern "C" void netdClientInitNetIdForResolv(NetIdForResolvFunctionType* function) {

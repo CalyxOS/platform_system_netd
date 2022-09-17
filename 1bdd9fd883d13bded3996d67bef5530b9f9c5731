@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cb3bacbc_daacd753",
+        "filename": "client/NetdClient.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 135,
+      "author": {
+        "id": 1000062
+      },
+      "writtenOn": "2022-09-17T18:11:23Z",
+      "side": 1,
+      "message": "Don\u0027t forget to adjust this when done testing",
+      "revId": "1bdd9fd883d13bded3996d67bef5530b9f9c5731",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dff38613_d0361fc9",
+        "filename": "client/NetdClient.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 183,
+      "author": {
+        "id": 1000062
+      },
+      "writtenOn": "2022-09-17T18:11:23Z",
+      "side": 1,
+      "message": "Don\u0027t forget about this \"0 \u0026\u0026\" used to stop it from taking effect while testing",
+      "revId": "1bdd9fd883d13bded3996d67bef5530b9f9c5731",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "45f0b06f_bf64e2c3",
+        "filename": "client/NetdClient.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 298,
+      "author": {
+        "id": 1000062
+      },
+      "writtenOn": "2022-09-17T18:11:23Z",
+      "side": 1,
+      "message": "All testing stuff, change later",
+      "revId": "1bdd9fd883d13bded3996d67bef5530b9f9c5731",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    }
+  ]
+}

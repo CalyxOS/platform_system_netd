@@ -17,6 +17,7 @@
 #include "NetdClient.h"
 
 #include <arpa/inet.h>
+#include <cutils/misc.h>           // FIRST_APPLICATION_UID
 #include <errno.h>
 #include <math.h>
 #include <resolv.h>
@@ -70,6 +71,10 @@ typedef int (*DnsOpenProxyType)();
 typedef int (*SendmmsgFunctionType)(int, const mmsghdr*, unsigned int, int);
 typedef ssize_t (*SendmsgFunctionType)(int, const msghdr*, unsigned int);
 typedef int (*SendtoFunctionType)(int, const void*, size_t, int, const sockaddr*, socklen_t);
+typedef int (*BindFunctionType)(int, const sockaddr*, socklen_t);
+typedef int (*GetsocknameFunctionType)(int, sockaddr*, socklen_t*);
+typedef int (*GetpeernameFunctionType)(int, sockaddr*, socklen_t*);
+typedef ssize_t (*RecvfromFunctionType)(int, void*, size_t len, int flags, sockaddr*, socklen_t*);
 
 // These variables are only modified at startup (when libc.so is loaded) and never afterwards, so
 // it's okay that they are read later at runtime without a lock.
@@ -79,6 +84,10 @@ SocketFunctionType libcSocket = nullptr;
 SendmmsgFunctionType libcSendmmsg = nullptr;
 SendmsgFunctionType libcSendmsg = nullptr;
 SendtoFunctionType libcSendto = nullptr;
+BindFunctionType libcBind = nullptr;
+GetsocknameFunctionType libcGetsockname = nullptr;
+GetpeernameFunctionType libcGetpeername = nullptr;
+RecvfromFunctionType libcRecvfrom = nullptr;
 
 static bool propertyValueIsTrue(const char* prop_name) {
     char prop_value[PROP_VALUE_MAX] = {0};
@@ -123,6 +132,46 @@ int closeFdAndSetErrno(int fd, int error) {
     return -1;
 }
 
+int isolateAbstractSockaddr(const sockaddr_un* addr, socklen_t addrlen,
+        sockaddr_un* sa, socklen_t* salen, bool reverse) {
+    int uid = getuid();
+    size_t namelen = addrlen - sizeof(sa_family_t);
+    size_t prefixlen;
+    sa->sun_path[0] = '\0'; // Abstract sockets must start with '\0'
+    if (uid >= FIRST_APPLICATION_UID) {
+        // Regular user apps get de facto separate namespaces
+        prefixlen = ABSTRACT_SOCKET_NAME_PREFIX_LEN;
+        if (!reverse) {
+            snprintf(&sa->sun_path[1], ABSTRACT_SOCKET_NAME_PREFIX_LEN + 1,
+                    ABSTRACT_SOCKET_NAME_PREFIX_FMT, uid);
+        } else {
+            // TODO: FIXME
+        }
+    } else {
+        // System apps all share a single de facto namespace separate from user apps
+        prefixlen = 1;
+        if (!reverse) {
+            sa->sun_path[1] = ABSTRACT_SOCKET_NAME_SYSTEM_PREFIX;
+        } else {
+            // TODO: FIXME
+        }
+    }
+    prefixlen = 1;
+    // TODO: adapt for reverse
+    if (namelen + prefixlen > sizeof(sa->sun_path)) {
+        return -1;
+    }
+    prefixlen = 0;
+    // Concatenate the original abstract socket name without a null terminator
+    memcpy(&sa->sun_path[1 + prefixlen], &addr->sun_path[1], namelen - 1);
+    // Mutate for testing
+    //sa->sun_path[1] = sa->sun_path[1] + 1;
+    prefixlen = 0;
+    //sa->sun_path[namelen] = 'Z';
+    *salen = addrlen + prefixlen;
+    return 0;
+}
+
 int netdClientAccept4(int sockfd, sockaddr* addr, socklen_t* addrlen, int flags) {
     int acceptedSocket = libcAccept4(sockfd, addr, addrlen, flags);
     if (acceptedSocket == -1) {
@@ -147,6 +196,26 @@ int netdClientAccept4(int sockfd, sockaddr* addr, socklen_t* addrlen, int flags)
 }
 
 int netdClientConnect(int sockfd, const sockaddr* addr, socklen_t addrlen) {
+    sockaddr* sa = (sockaddr*)addr;
+    socklen_t salen = addrlen;
+
+    if ((addr != nullptr) && (addr->sa_family == AF_UNIX)) {
+        sockaddr_un* orig_sa = (sockaddr_un*)addr;
+        // Is it an abstract socket? sun_path must be >1 bytes and must start with '\0'
+        if (((size_t)addrlen > (sizeof(sa_family_t) + 1)) && (orig_sa->sun_path[0] == '\0')) {
+            struct sockaddr_un sa_un = {
+                    .sun_family = AF_UNIX,
+                    .sun_path = "\0",
+            };
+            if (isolateAbstractSockaddr(orig_sa, addrlen, &sa_un, &salen, false) == 0) {
+                sa = (sockaddr*)&sa_un;
+            } else {
+                return EPERM;
+                //return ECONNREFUSED;
+            }
+        }
+    }
+
     const bool shouldSetFwmark = shouldMarkSocket(sockfd, addr);
     if (shouldSetFwmark) {
         FwmarkCommand command = {FwmarkCommand::ON_CONNECT, 0, 0, 0};
@@ -165,7 +234,7 @@ int netdClientConnect(int sockfd, const sockaddr* addr, socklen_t addrlen) {
     }
     // Latency measurement does not include time of sending commands to Fwmark
     Stopwatch s;
-    const int ret = libcConnect(sockfd, addr, addrlen);
+    const int ret = libcConnect(sockfd, sa, salen);
     // Save errno so it isn't clobbered by sending ON_CONNECT_COMPLETE
     const int connectErrno = errno;
     const auto latencyMs = static_cast<unsigned>(s.timeTakenUs() / 1000);
@@ -241,6 +310,57 @@ int netdClientSendto(int sockfd, const void* buf, size_t bufsize, int flags, con
         }
     }
     return libcSendto(sockfd, buf, bufsize, flags, addr, addrlen);
+}
+
+int netdClientBind(int sockfd, const sockaddr* addr, socklen_t addrlen) {
+    if ((addr != nullptr) && (addr->sa_family == AF_UNIX)) {
+        sockaddr_un* orig_sa = (sockaddr_un*)addr;
+        // Is it an abstract socket? sun_path must be >1 bytes and must start with '\0'
+        if (((size_t)addrlen > (sizeof(sa_family_t) + 1)) && (orig_sa->sun_path[0] == '\0')) {
+            struct sockaddr_un sa = {
+                    .sun_family = AF_UNIX,
+                    .sun_path = "\0",
+            };
+            socklen_t salen;
+            if (isolateAbstractSockaddr(orig_sa, addrlen, &sa, &salen, false) == 0) {
+                return libcBind(sockfd, (sockaddr*)&sa, salen);
+            } else {
+                return ENAMETOOLONG;
+            }
+        }
+    }
+    return libcBind(sockfd, addr, addrlen);
+}
+
+int netdClientGetsockname(int sockfd, sockaddr* addr, socklen_t* addrlen) {
+    // TODO NOT FINISHED NOT FINISHED NOT FINISHED
+    return libcGetsockname(sockfd, addr, addrlen);
+    /*if ((addr != nullptr) && (addr->sa_family == AF_UNIX)) {
+        sockaddr_un* orig_sa = (sockaddr_un*)addr;
+        // Is it an abstract socket? sun_path must be >1 bytes and must start with '\0'
+        if (((size_t)addrlen > (sizeof(sa_family_t) + 1)) && (orig_sa->sun_path[0] == '\0')) {
+            struct sockaddr_un sa = {
+                    .sun_family = AF_UNIX,
+                    .sun_path = "\0",
+            };
+            socklen_t salen;
+            if (isolateAbstractSockaddr(orig_sa, addrlen, &sa, &salen, true) == 0) {
+                return libcGetsockname(sockfd, (sockaddr*)&sa, salen);
+            } else {
+                // TODO: something else
+                return EPERM;
+            }
+        }
+    }*/
+}
+
+int netdClientGetpeername(int sockfd, sockaddr* addr, socklen_t* addrlen) {
+    return libcGetpeername(sockfd, addr, addrlen);
+}
+
+ssize_t netdClientRecvfrom(int sockfd, void* buf, size_t len, int flags, sockaddr* src_addr,
+        socklen_t* src_addr_length) {
+    return libcRecvfrom(sockfd, buf, len, flags, src_addr, src_addr_length);
 }
 
 unsigned getNetworkForResolv(unsigned netId) {
@@ -442,6 +562,22 @@ extern "C" void netdClientInitSendto(SendtoFunctionType* function) {
         return;
     }
     HOOK_ON_FUNC(function, libcSendto, netdClientSendto);
+}
+
+extern "C" void netdClientInitBind(BindFunctionType* function) {
+    HOOK_ON_FUNC(function, libcBind, netdClientBind);
+}
+
+extern "C" void netdClientInitGetsockname(GetsocknameFunctionType* function) {
+    HOOK_ON_FUNC(function, libcGetsockname, netdClientGetsockname);
+}
+
+extern "C" void netdClientInitGetpeername(GetpeernameFunctionType* function) {
+    HOOK_ON_FUNC(function, libcGetpeername, netdClientGetpeername);
+}
+
+extern "C" void netdClientInitRecvfrom(RecvfromFunctionType* function) {
+    HOOK_ON_FUNC(function, libcRecvfrom, netdClientRecvfrom);
 }
 
 extern "C" void netdClientInitNetIdForResolv(NetIdForResolvFunctionType* function) {

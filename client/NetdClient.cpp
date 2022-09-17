@@ -70,6 +70,10 @@ typedef int (*DnsOpenProxyType)();
 typedef int (*SendmmsgFunctionType)(int, const mmsghdr*, unsigned int, int);
 typedef ssize_t (*SendmsgFunctionType)(int, const msghdr*, unsigned int);
 typedef int (*SendtoFunctionType)(int, const void*, size_t, int, const sockaddr*, socklen_t);
+typedef int (*BindFunctionType)(int, const sockaddr*, socklen_t);
+typedef int (*GetsocknameFunctionType)(int, sockaddr*, socklen_t*);
+typedef int (*GetpeernameFunctionType)(int, sockaddr*, socklen_t*);
+typedef ssize_t (*RecvfromFunctionType)(int, void*, size_t len, int flags, sockaddr*, socklen_t*);
 
 // These variables are only modified at startup (when libc.so is loaded) and never afterwards, so
 // it's okay that they are read later at runtime without a lock.
@@ -79,6 +83,10 @@ SocketFunctionType libcSocket = nullptr;
 SendmmsgFunctionType libcSendmmsg = nullptr;
 SendmsgFunctionType libcSendmsg = nullptr;
 SendtoFunctionType libcSendto = nullptr;
+BindFunctionType libcBind = nullptr;
+GetsocknameFunctionType libcGetsockname = nullptr;
+GetpeernameFunctionType libcGetpeername = nullptr;
+RecvfromFunctionType libcRecvfrom = nullptr;
 
 static bool propertyValueIsTrue(const char* prop_name) {
     char prop_value[PROP_VALUE_MAX] = {0};
@@ -241,6 +249,29 @@ int netdClientSendto(int sockfd, const void* buf, size_t bufsize, int flags, con
         }
     }
     return libcSendto(sockfd, buf, bufsize, flags, addr, addrlen);
+}
+
+int netdClientBind(int sockfd, const sockaddr* addr, socklen_t addrlen) {
+    return libcBind(sockfd, addr, addrlen);
+}
+
+int callNetdClientGetname(const char* funcname, GetsocknameFunctionType func,
+        int sockfd, sockaddr* addr, socklen_t* paddrlen) {
+    assert(funcname == funcname); // satisfy compiler that funcname is used right now
+    return func(sockfd, addr, paddrlen);
+}
+
+int netdClientGetsockname(int sockfd, sockaddr* addr, socklen_t* paddrlen) {
+    return callNetdClientGetname("netdClientGetsockname", libcGetsockname, sockfd, addr, paddrlen);
+}
+
+int netdClientGetpeername(int sockfd, sockaddr* addr, socklen_t* paddrlen) {
+    return callNetdClientGetname("netdClientGetpeername", libcGetpeername, sockfd, addr, paddrlen);
+}
+
+ssize_t netdClientRecvfrom(int sockfd, void* buf, size_t len, int flags, sockaddr* src_addr,
+        socklen_t* src_addr_length) {
+    return libcRecvfrom(sockfd, buf, len, flags, src_addr, src_addr_length);
 }
 
 unsigned getNetworkForResolv(unsigned netId) {
@@ -442,6 +473,22 @@ extern "C" void netdClientInitSendto(SendtoFunctionType* function) {
         return;
     }
     HOOK_ON_FUNC(function, libcSendto, netdClientSendto);
+}
+
+extern "C" void netdClientInitBind(BindFunctionType* function) {
+    HOOK_ON_FUNC(function, libcBind, netdClientBind);
+}
+
+extern "C" void netdClientInitGetsockname(GetsocknameFunctionType* function) {
+    HOOK_ON_FUNC(function, libcGetsockname, netdClientGetsockname);
+}
+
+extern "C" void netdClientInitGetpeername(GetpeernameFunctionType* function) {
+    HOOK_ON_FUNC(function, libcGetpeername, netdClientGetpeername);
+}
+
+extern "C" void netdClientInitRecvfrom(RecvfromFunctionType* function) {
+    HOOK_ON_FUNC(function, libcRecvfrom, netdClientRecvfrom);
 }
 
 extern "C" void netdClientInitNetIdForResolv(NetIdForResolvFunctionType* function) {

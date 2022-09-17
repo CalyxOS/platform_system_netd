@@ -17,6 +17,18 @@
 #ifndef NETD_CLIENT_NETD_CLIENT_PRIV_H
 #define NETD_CLIENT_NETD_CLIENT_PRIV_H
 
+// Max length of uid when formatted as string for abstract socket name prefix.
+// Also change format string if changing this.
+#define ABSTRACT_SOCKET_NAME_PREFIX_LEN 8
+// UID format string, padded to max length (same as above)
+#define ABSTRACT_SOCKET_NAME_PREFIX_FMT "%08u"
+// Single-character socket name prefix for system apps
+#define ABSTRACT_SOCKET_NAME_SYSTEM_PREFIX 'S'
+
+#define ZYGOTE_UID 1000
+#define ZYGOTE_APP_PREFIX "com.android.internal.os.AppZygoteInit/"
+#define ZYGOTE_WEBVIEW_PREFIX "com.android.internal.os.WebViewZygoteInit/"
+
 int getNetworkForDnsInternal(int fd, unsigned* dnsNetId);
 
 extern "C" {

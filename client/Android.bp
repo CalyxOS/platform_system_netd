@@ -32,6 +32,9 @@ cc_library {
         "libnetd_client_headers",
         "libbase_headers", // for unique_fd.h
     ],
+    shared_libs: [
+        "liblog",
+    ],
     export_header_lib_headers: ["libnetd_client_headers"],
     include_dirs: [
         "frameworks/libs/net/common/netd/libnetdutils/include",

@@ -16,6 +16,24 @@
       "message": "What\u0027s the intended / actual effect of removing this here? Just wondering.",
       "revId": "7cd9a5fa75ee363fbb4e115c434f802d0b305c24",
       "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fd48fe6c_fe7d2fe0",
+        "filename": "client/NetdClient.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 298,
+      "author": {
+        "id": 1000062
+      },
+      "writtenOn": "2022-09-19T18:03:24Z",
+      "side": 0,
+      "message": "Got your answer elsewhere, ty: https://cs.android.com/android/platform/superproject/+/android-13.0.0_r3:libcore/ojluni/src/main/java/java/net/Inet6AddressImpl.java;l\u003d150",
+      "parentUuid": "c514064f_da397347",
+      "revId": "7cd9a5fa75ee363fbb4e115c434f802d0b305c24",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
     }
   ]
 }

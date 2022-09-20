@@ -19,6 +19,7 @@
 #include <arpa/inet.h>
 #include <errno.h>
 #include <math.h>
+#include <paths.h>  /* for _PATH_DEVNULL */
 #include <resolv.h>
 #include <stdlib.h>
 #include <sys/socket.h>
@@ -298,8 +299,21 @@ int dns_open_proxy() {
         errno = EPERM;
         return -1;
     }
+
     const auto socketFunc = libcSocket ? libcSocket : socket;
-    int s = socketFunc(AF_UNIX, SOCK_STREAM | SOCK_CLOEXEC, 0);
+
+    // If we can't create an INET6 socket, we are blocked elsewhere,
+    // e.g. in firewall chains, and shouldn't be allowed to resolve DNS.
+    int s = socketFunc(AF_INET6, SOCK_DGRAM | SOCK_CLOEXEC, 0);
+    if (s < 0) {
+        // Nevertheless, we pretend to bionic that nothing is wrong.
+        // Otherwise, a SecurityException will eventually be raised.
+        return open(_PATH_DEVNULL, O_RDWR | O_CLOEXEC);
+    } else {
+        close(s);
+    }
+
+    s = socketFunc(AF_UNIX, SOCK_STREAM | SOCK_CLOEXEC, 0);
     if (s == -1) {
         return -1;
     }

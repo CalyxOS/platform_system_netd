@@ -19,6 +19,7 @@
 #include <arpa/inet.h>
 #include <errno.h>
 #include <math.h>
+#include <paths.h>  /* for _PATH_DEVNULL */
 #include <resolv.h>
 #include <stdlib.h>
 #include <sys/socket.h>
@@ -298,8 +299,21 @@ int dns_open_proxy() {
         errno = ECONNREFUSED;
         return -1;
     }
+
     const auto socketFunc = libcSocket ? libcSocket : socket;
-    int s = socketFunc(AF_UNIX, SOCK_STREAM | SOCK_CLOEXEC, 0);
+
+    // If we can't create an INET6 socket, we are restricted elsewhere, e.g. in firewall chains,
+    // so we shouldn't be allowed to resolve DNS. (setNetworkForTarget does this check, too.)
+    int s = socketFunc(AF_INET6, SOCK_DGRAM | SOCK_CLOEXEC, 0);
+    if (s < 0) {
+        // Despite being restricted, we want to avoid a resulting SecurityException down the line.
+        // If we pass a /dev/null descriptor instead, bionic will handle the situation without one.
+        return open(_PATH_DEVNULL, O_RDWR | O_CLOEXEC);
+    } else {
+        close(s);
+    }
+
+    s = socketFunc(AF_UNIX, SOCK_STREAM | SOCK_CLOEXEC, 0);
     if (s == -1) {
         return -1;
     }

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "058209a2_da37fed7",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000062
+      },
+      "writtenOn": "2022-09-21T06:23:19Z",
+      "side": 1,
+      "message": "Note: This should have https://review.calyxos.org/c/CalyxOS/platform_system_netd/+/13341 as its parent, ideally keeping the errno set to something, e.g. EAFNOSUPPORT (otherwise errno\u0027s value later seen by the caller *could* be unpredictable)",
+      "revId": "913b7e9d548540b627fd86b6395436e09f38bf05",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    }
+  ]
+}

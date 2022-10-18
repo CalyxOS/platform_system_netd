@@ -16,6 +16,24 @@
       "message": "Note: This should have https://review.calyxos.org/c/CalyxOS/platform_system_netd/+/13341 as its parent, ideally keeping the errno set to something, e.g. EAFNOSUPPORT (otherwise errno\u0027s value later seen by the caller *could* be unpredictable)",
       "revId": "913b7e9d548540b627fd86b6395436e09f38bf05",
       "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c5ae9f6d_ab153ecd",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2022-10-18T14:40:54Z",
+      "side": 1,
+      "message": "Rebased through gerrit web ui to depend on that change.\n\nWould ECONNREFUSED be ok as well?",
+      "parentUuid": "058209a2_da37fed7",
+      "revId": "913b7e9d548540b627fd86b6395436e09f38bf05",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
     }
   ]
 }

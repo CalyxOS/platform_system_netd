@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "051a3f27_65f3639e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000062
+      },
+      "writtenOn": "2022-10-24T13:15:56Z",
+      "side": 1,
+      "message": "I\u0027ve been daily-driving this along with I912a4a2e for a while, and it seems to work fine for topic:bpf-socket-blocking; could still use more testing if it\u0027s going to be used. Various DNS and other connectivity issues, which I now believe to be unrelated, held me back from verifying it sooner.",
+      "revId": "25ffa8e7ce275989b087e0ac6f068672d180d624",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    }
+  ]
+}

@@ -16,6 +16,69 @@
       "message": "I\u0027ve been daily-driving this along with I912a4a2e for a while, and it seems to work fine for topic:bpf-socket-blocking; could still use more testing if it\u0027s going to be used. Various DNS and other connectivity issues, which I now believe to be unrelated, held me back from verifying it sooner.",
       "revId": "25ffa8e7ce275989b087e0ac6f068672d180d624",
       "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "923aa7a4_3cc02897",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000002
+      },
+      "writtenOn": "2022-11-22T22:56:47Z",
+      "side": 1,
+      "message": "Commit message may need some tweaks",
+      "revId": "25ffa8e7ce275989b087e0ac6f068672d180d624",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "73229cbd_a318229e",
+        "filename": "client/NetdClient.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 311,
+      "author": {
+        "id": 1000002
+      },
+      "writtenOn": "2022-11-22T22:56:47Z",
+      "side": 1,
+      "message": "Anything that\u0027s not EPERM or EACCESS will do.\n\nFor example:\n```\nerrno \u003d ECONNREFUSED;\nreturn -1;\n```",
+      "range": {
+        "startLine": 311,
+        "startChar": 15,
+        "endLine": 311,
+        "endChar": 54
+      },
+      "revId": "25ffa8e7ce275989b087e0ac6f068672d180d624",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2ff4b763_7756374f",
+        "filename": "client/NetdClient.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 314,
+      "author": {
+        "id": 1000002
+      },
+      "writtenOn": "2022-11-22T22:56:47Z",
+      "side": 1,
+      "message": "Do this unconditionally (match setNetworkForTarget). Line above socketFunc",
+      "range": {
+        "startLine": 312,
+        "startChar": 4,
+        "endLine": 314,
+        "endChar": 5
+      },
+      "revId": "25ffa8e7ce275989b087e0ac6f068672d180d624",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
     }
   ]
 }

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3714279e_a4f75eba",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000062
+      },
+      "writtenOn": "2022-11-23T23:14:51Z",
+      "side": 1,
+      "message": "Oliver correctly pointed out that it makes no sense for the inet-gid code to work without /dev/null shenanigans, but this code to require it. Finally found the reason - needed netdClientSocket to get in on the lie.\n\nTested with ThornApple, DuckDuckGo, and Termux. Connection Refused for socket creation and direct IP access/ping, and `name not resolved` or `unknown host` for dns lookups (`DNS_PROBE_STARTED` in Chromium, eventually leading to \"No internet\").",
+      "revId": "0f74fff3078c80006274d073fab48ee747c6e56f",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    }
+  ]
+}

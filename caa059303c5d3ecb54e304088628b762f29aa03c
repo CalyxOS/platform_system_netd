@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "79250d63_cf057bb6",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000062
+      },
+      "writtenOn": "2022-11-23T05:14:34Z",
+      "side": 1,
+      "message": "I should mention that Ie78e3a06 (the ECONNREFUSED patch) doesn\u0027t actually have any effect here after all, because it depends on inet gid changes, which we don\u0027t do.\n\nThat being said, DuckDuckGo is not crashing now, anyway. It receives `net::ERR_NAME_NOT_RESOLVED` for DNS lookups, and `net::ERR_ACCESS_DENIED` for direct IP address access attempts (e.g. https://9.9.9.9), and neither causes a crash.\n\nAre there other apps that should be tested for crashing? Otherwise, behavior seems proper to me and ThornApple appears to act as expected.\n\nIf we think SecurityException could still be a problem, we can add something like this to netdClientSocket()\u0027s `if (socketFd \u003d\u003d -1)` block, and that will change the error when accessing https://9.9.9.9:\n```\n        if (errno \u003d\u003d EPERM \u0026\u0026 FwmarkCommand::isSupportedFamily(domain)) {\n            // EPERM means our firewall blocked it, but we want to avoid a later SecurityException.\n            // (In a sense, the address family *is* unsupported in this case...)\n            errno \u003d EAFNOSUPPORT;\n        }\n```\n\n(I have that in another variant of this patch, but I\u0027m not sure if it\u0027s really needed.)",
+      "revId": "caa059303c5d3ecb54e304088628b762f29aa03c",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    }
+  ]
+}

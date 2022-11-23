@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "94ca40d0_982b7975",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000062
+      },
+      "writtenOn": "2022-11-23T05:45:45Z",
+      "side": 1,
+      "message": "I\u0027m just not sure if this is necessary, but it\u0027s here if we need it. As I was saying in I7939ee03:\n\nEven prior to this commit, DuckDuckGo is not crashing. It receives `net::ERR_NAME_NOT_RESOLVED` for DNS lookups (https://calyxos.org) and `net::ERR_ACCESS_DENIED` for direct IP address access attempts (e.g. https://9.9.9.9), and neither causes a crash. Termux receives `socket: Operation not permitted` for direct-IP pings. These existing errors are both descriptive and accurate, so if nothing is crashing, why change it?\n\nAre there other apps that should be tested for crashing, or for other behaviors? If not, behavior seems proper to me, and ThornApple appears to act as expected.",
+      "revId": "63227e1a932e6828681ce4e872504aa6a32ec4e8",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    }
+  ]
+}

@@ -85,6 +85,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "0f78d887_a55523b0",
+        "filename": "client/NetdClient.cpp",
+        "patchSetId": 8
+      },
+      "lineNbr": 193,
+      "author": {
+        "id": 1000002
+      },
+      "writtenOn": "2022-11-23T23:28:16Z",
+      "side": 1,
+      "message": "ok, maybe switch the order of evaluation to reflect that we know that a socket failed to create, then we check that it is of type INET, and that the specific error is EPERM indicating eBPF blocked it. If you really want to can also make a short comment about it",
+      "parentUuid": "9e70df00_35b9fed4",
+      "range": {
+        "startLine": 193,
+        "startChar": 12,
+        "endLine": 193,
+        "endChar": 30
+      },
+      "revId": "0f74fff3078c80006274d073fab48ee747c6e56f",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "81bc685d_d1cd2f9e",
         "filename": "client/NetdClient.cpp",
         "patchSetId": 8

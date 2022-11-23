@@ -61,6 +61,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "9e70df00_35b9fed4",
+        "filename": "client/NetdClient.cpp",
+        "patchSetId": 8
+      },
+      "lineNbr": 193,
+      "author": {
+        "id": 1000062
+      },
+      "writtenOn": "2022-11-23T23:25:38Z",
+      "side": 1,
+      "message": "The condition is just to ensure that legitimate errors creating sockets are not altered. We don\u0027t *need* the condition, but it would be nice for legitimate errors to be passed along imo",
+      "parentUuid": "7769bff7_755cdfbc",
+      "range": {
+        "startLine": 193,
+        "startChar": 12,
+        "endLine": 193,
+        "endChar": 30
+      },
+      "revId": "0f74fff3078c80006274d073fab48ee747c6e56f",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "81bc685d_d1cd2f9e",
         "filename": "client/NetdClient.cpp",
         "patchSetId": 8
@@ -72,6 +96,30 @@
       "writtenOn": "2022-11-23T23:15:58Z",
       "side": 1,
       "message": "Can probably leave this one outside the condition? All we want to change is the errno to ECONNREFUSED?",
+      "range": {
+        "startLine": 198,
+        "startChar": 12,
+        "endLine": 198,
+        "endChar": 22
+      },
+      "revId": "0f74fff3078c80006274d073fab48ee747c6e56f",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "47e7908d_3a35f1bb",
+        "filename": "client/NetdClient.cpp",
+        "patchSetId": 8
+      },
+      "lineNbr": 198,
+      "author": {
+        "id": 1000062
+      },
+      "writtenOn": "2022-11-23T23:25:38Z",
+      "side": 1,
+      "message": "100%, thanks, that should never have been moved and could have caused unforeseen issues.",
+      "parentUuid": "81bc685d_d1cd2f9e",
       "range": {
         "startLine": 198,
         "startChar": 12,

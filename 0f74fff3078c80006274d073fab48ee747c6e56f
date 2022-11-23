@@ -107,6 +107,30 @@
       "serverId": "35266860-6252-469c-a67d-185064479fc0"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "73af2bad_f7e20f8e",
+        "filename": "client/NetdClient.cpp",
+        "patchSetId": 8
+      },
+      "lineNbr": 193,
+      "author": {
+        "id": 1000002
+      },
+      "writtenOn": "2022-11-23T23:37:54Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0f78d887_a55523b0",
+      "range": {
+        "startLine": 193,
+        "startChar": 12,
+        "endLine": 193,
+        "endChar": 30
+      },
+      "revId": "0f74fff3078c80006274d073fab48ee747c6e56f",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "81bc685d_d1cd2f9e",

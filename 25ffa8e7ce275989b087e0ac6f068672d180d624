@@ -58,6 +58,30 @@
       "serverId": "35266860-6252-469c-a67d-185064479fc0"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d360a11d_15c25c14",
+        "filename": "client/NetdClient.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 311,
+      "author": {
+        "id": 1000062
+      },
+      "writtenOn": "2022-11-23T04:21:36Z",
+      "side": 1,
+      "message": "tl;dr: This suggestion doesn\u0027t work because dns_open_proxy/dnsOpenProxy is only expected to return an error if INTERNET permission is missing or if there\u0027s an unusual system configuration. If we do this, a SecurityException is generated. Yes, this is an important difference from what we do in the other functions modified by Ie78e3a06; they truly don\u0027t operate the same way.\n\nTo test, you can see that DuckDuckGo crashes with a SecurityException when we fail out of this function, no matter what error we choose. I just tried doing that, both without and with Ie78e3a06 - no difference. We need to return an actual open file descriptor, or the chain of events leads to a SecurityException. Here\u0027s a crash log: https://gitlab.com/-/snippets/2462133. The stack trace is pretty helpful. Here\u0027s a relevant portion:\n```\njava.lang.SecurityException: Permission denied (missing INTERNET permission?)\n\tat java.net.Inet6AddressImpl.lookupHostByName(Inet6AddressImpl.java:150)\n[...]\nCaused by: android.system.GaiException: android_getaddrinfo failed: EAI_NODATA (No address associated with hostname)\n \tat libcore.io.Linux.android_getaddrinfo(Native Method)\n \tat libcore.io.ForwardingOs.android_getaddrinfo(ForwardingOs.java:133)\n \tat libcore.io.BlockGuardOs.android_getaddrinfo(BlockGuardOs.java:222)\n \tat libcore.io.ForwardingOs.android_getaddrinfo(ForwardingOs.java:133)\n \tat java.net.Inet6AddressImpl.lookupHostByName(Inet6AddressImpl.java:135)\n \t... 25 more\n Caused by: android.system.ErrnoException: android_getaddrinfo failed: EPERM (Operation not permitted)\n```\n...more on all this in the call chain later.\n\nIt makes some sense: dnsproxyd is hosted on-device via UNIX socket, and from the looks of things, the system only expects dns_open_proxy to fail if the device is configured with `ANDROID_DNS_MODE !\u003d \"local\"` (top of function), or if the process lacks the INTERNET permission. (There is also the TEMP_FAILURE_RETRY part, but there is not a description of why that might happen...) dnsproxyd is not an online service - it\u0027s on-device, so having actual network access doesn\u0027t have a natural impact on whether this function would fail, either. It seems reasonable for a failure to be treated as a SecurityException, eventually, and that\u0027s the behavior I\u0027ve observed.\n\nOn the other hand, if we return a file descriptor to /dev/null, things seem to work out in all of my testing; it avoids [android_getaddrinfo_proxy](https://cs.android.com/android/platform/superproject/+/android-13.0.0_r8:bionic/libc/dns/net/getaddrinfo.c;l\u003d425-428) returning EAI_SYSTEM, which appears to be the biggest issue. Instead, it returns EAI_NODATA. Without the ability to debug, one could follow the call chain for a long, long time...\n\nIn any case, here\u0027s some of the call chain:\n- https://cs.android.com/android/platform/superproject/+/android-13.0.0_r8:bionic/libc/dns/net/getaddrinfo.c;l\u003d425. If the file descriptor for the proxy cannot be opened, that function returns `EAI_SYSTEM`. Otherwise, it returns `EAI_NODATA`. (I\u0027m not sure how to debug bionic directly, but I wrote a test that can be compiled on Linux that should contain enough to reproduce and step through the logic with gdb: https://gitlab.com/-/snippets/2462181)\n- https://cs.android.com/android/platform/superproject/+/android-13.0.0_r8:bionic/libc/dns/net/getaddrinfo.c;l\u003d733. When it\u0027s not `EAI_SYSTEM`, we return right away.\n- https://cs.android.com/android/platform/superproject/+/android-13.0.0_r8:libcore/luni/src/main/native/libcore_io_Linux.cpp;l\u003d1382-1387\n- https://cs.android.com/android/platform/superproject/+/android-13.0.0_r8:libcore/luni/src/main/native/libcore_io_Linux.cpp;l\u003d274-283",
+      "parentUuid": "73229cbd_a318229e",
+      "range": {
+        "startLine": 311,
+        "startChar": 15,
+        "endLine": 311,
+        "endChar": 54
+      },
+      "revId": "25ffa8e7ce275989b087e0ac6f068672d180d624",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2ff4b763_7756374f",
@@ -71,6 +95,30 @@
       "writtenOn": "2022-11-22T22:56:47Z",
       "side": 1,
       "message": "Do this unconditionally (match setNetworkForTarget). Line above socketFunc",
+      "range": {
+        "startLine": 312,
+        "startChar": 4,
+        "endLine": 314,
+        "endChar": 5
+      },
+      "revId": "25ffa8e7ce275989b087e0ac6f068672d180d624",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1977d0ec_0a059f92",
+        "filename": "client/NetdClient.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 314,
+      "author": {
+        "id": 1000062
+      },
+      "writtenOn": "2022-11-23T04:21:36Z",
+      "side": 1,
+      "message": "`socketFd \u003c 0` is not a valid file descriptor. In this situation, nothing was opened, so there is nothing to close. setNetworkForTarget doesn\u0027t do this unconditionally either.",
+      "parentUuid": "2ff4b763_7756374f",
       "range": {
         "startLine": 312,
         "startChar": 4,

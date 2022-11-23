@@ -16,6 +16,75 @@
       "message": "Oliver correctly pointed out that it makes no sense for the inet-gid code to work without /dev/null shenanigans, but this code to require it. Finally found the reason - needed netdClientSocket to get in on the lie.\n\nTested with ThornApple, DuckDuckGo, and Termux. Connection Refused for socket creation and direct IP access/ping, and `name not resolved` or `unknown host` for dns lookups (`DNS_PROBE_STARTED` in Chromium, eventually leading to \"No internet\").",
       "revId": "0f74fff3078c80006274d073fab48ee747c6e56f",
       "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7769bff7_755cdfbc",
+        "filename": "client/NetdClient.cpp",
+        "patchSetId": 8
+      },
+      "lineNbr": 193,
+      "author": {
+        "id": 1000002
+      },
+      "writtenOn": "2022-11-23T23:15:58Z",
+      "side": 1,
+      "message": "I am not sure I\u0027d filter by EPERM. And I suppose that isSupportedFamily is to determine that the socket that failed to create just came back from netd.c hook for inet/create?",
+      "range": {
+        "startLine": 193,
+        "startChar": 12,
+        "endLine": 193,
+        "endChar": 30
+      },
+      "revId": "0f74fff3078c80006274d073fab48ee747c6e56f",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "81bc685d_d1cd2f9e",
+        "filename": "client/NetdClient.cpp",
+        "patchSetId": 8
+      },
+      "lineNbr": 198,
+      "author": {
+        "id": 1000002
+      },
+      "writtenOn": "2022-11-23T23:15:58Z",
+      "side": 1,
+      "message": "Can probably leave this one outside the condition? All we want to change is the errno to ECONNREFUSED?",
+      "range": {
+        "startLine": 198,
+        "startChar": 12,
+        "endLine": 198,
+        "endChar": 22
+      },
+      "revId": "0f74fff3078c80006274d073fab48ee747c6e56f",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cd8b12b1_11175459",
+        "filename": "client/NetdClient.cpp",
+        "patchSetId": 8
+      },
+      "lineNbr": 312,
+      "author": {
+        "id": 1000002
+      },
+      "writtenOn": "2022-11-23T23:15:58Z",
+      "side": 1,
+      "message": "I was ok with reusing s but not an issue",
+      "range": {
+        "startLine": 312,
+        "startChar": 8,
+        "endLine": 312,
+        "endChar": 23
+      },
+      "revId": "0f74fff3078c80006274d073fab48ee747c6e56f",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
     }
   ]
 }

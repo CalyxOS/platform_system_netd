@@ -190,6 +190,12 @@ int netdClientSocket(int domain, int type, int protocol) {
     }
     int socketFd = libcSocket(domain, type, protocol);
     if (socketFd == -1) {
+        if (errno == EPERM && FwmarkCommand::isSupportedFamily(domain)) {
+            // EPERM means BPF firewall blocked the creation. ECONNREFUSED is not documented as a
+            // possible error for an inet socket creation denial, but we want to avoid a potential
+            // SecurityException later, so we change it from EPERM.
+            errno = ECONNREFUSED;
+        }
         return -1;
     }
     unsigned netId = netIdForProcess & ~NETID_USE_LOCAL_NAMESERVERS;

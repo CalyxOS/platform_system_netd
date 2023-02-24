@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d44ab61c_727a92e1",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000062
+      },
+      "writtenOn": "2023-02-24T14:21:01Z",
+      "side": 1,
+      "message": "The drop table and its routes stick around indefinitely.\n\nMake sure it gets flushed (probably update flushRoutes).",
+      "revId": "c6896de2c9928e11117436d38e7ded2c459a1aad",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c4ecb25e_80d59d70",
+        "filename": "server/RouteController.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 238,
+      "author": {
+        "id": 1000062
+      },
+      "writtenOn": "2023-02-24T14:21:01Z",
+      "side": 1,
+      "message": "nit: Use camel case for drop_offset var",
+      "revId": "c6896de2c9928e11117436d38e7ded2c459a1aad",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e0e84111_08dc7d5b",
+        "filename": "server/RouteController.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 1070,
+      "author": {
+        "id": 1000062
+      },
+      "writtenOn": "2023-02-24T14:21:01Z",
+      "side": 1,
+      "message": "nit: Use camel case for table_drop var",
+      "revId": "c6896de2c9928e11117436d38e7ded2c459a1aad",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "553d6164_f687aa19",
+        "filename": "server/RouteController.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 1188,
+      "author": {
+        "id": 1000062
+      },
+      "writtenOn": "2023-02-24T14:21:01Z",
+      "side": 1,
+      "message": "Should we do something if modifying the route for the drop table fails? If this is considered an error, does that mean we should undo what was done for the actual route being modified before we return? And then what if that fails?\n\nMaybe the better response would be to write a log message but not return an error.",
+      "revId": "c6896de2c9928e11117436d38e7ded2c459a1aad",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "caa76f81_93db035d",
+        "filename": "server/RouteController.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 173,
+      "author": {
+        "id": 1000062
+      },
+      "writtenOn": "2023-02-24T14:21:01Z",
+      "side": 1,
+      "message": "All of these should default to false and should only be set true for virtual networks.",
+      "revId": "c6896de2c9928e11117436d38e7ded2c459a1aad",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    }
+  ]
+}

@@ -18,6 +18,23 @@
       "serverId": "35266860-6252-469c-a67d-185064479fc0"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a39cbc7d_0fa5ec89",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000062
+      },
+      "writtenOn": "2023-02-24T14:22:17Z",
+      "side": 1,
+      "message": "Looks like this is *almost* working as intended, except for the to-do / unresolved items. In a breakpoint when onInterfaceRemoved is called, the routes in the tun0 table are gone, but tun0_drop and its routes are still there, as is the rule. The rule is properly removed as well (but as indicated, the drop routes in the drop table still need to get flushed).",
+      "revId": "c6896de2c9928e11117436d38e7ded2c459a1aad",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c4ecb25e_80d59d70",

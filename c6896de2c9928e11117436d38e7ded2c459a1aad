@@ -71,6 +71,24 @@
       "serverId": "35266860-6252-469c-a67d-185064479fc0"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6cef504c_221ae532",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000062
+      },
+      "writtenOn": "2023-02-24T20:22:50Z",
+      "side": 1,
+      "message": "Had a bug in getting the index for the local or drop tables (was using an offset of TableType, which is nonsense); fixed.",
+      "parentUuid": "143754c9_60ce70b5",
+      "revId": "c6896de2c9928e11117436d38e7ded2c459a1aad",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c4ecb25e_80d59d70",

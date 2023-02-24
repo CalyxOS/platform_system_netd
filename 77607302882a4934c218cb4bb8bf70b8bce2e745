@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "110f14e5_43e1816a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000062
+      },
+      "writtenOn": "2023-02-24T20:22:50Z",
+      "side": 1,
+      "message": "Confirmed that the tun0_drop dummy0 routes still exist when onInterfaceRemoved is reached, and (now) they are properly flushed by netd later. This seems promising so far, but it will only be useful in concert with other changes in firewall-update-sync.",
+      "revId": "77607302882a4934c218cb4bb8bf70b8bce2e745",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    }
+  ]
+}

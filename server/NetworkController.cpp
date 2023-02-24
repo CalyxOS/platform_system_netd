@@ -923,17 +923,46 @@ int NetworkController::modifyRoute(unsigned netId, const char* interface, const 
         tableType = RouteController::INTERFACE;
     }
 
+    const bool withDrop = tableType == RouteController::INTERFACE && isVirtualNetworkLocked(netId);
+
+    int ret = -EINVAL;
+
     switch (op) {
         case ROUTE_ADD:
-            return RouteController::addRoute(interface, destination, nexthop, tableType, mtu,
+            ret = RouteController::addRoute(interface, destination, nexthop, tableType, mtu,
                                              0 /* priority */);
+            if (withDrop) {
+                if (int ret = RouteController::addRoute(interface, destination, nexthop,
+                                                        RouteController::INTERFACE_DROP,
+                                                        mtu, 0 /* priority */)) {
+                    ALOGE("failed to add drop route for %s (%s)", interface, strerror(ret));
+                }
+            }
+            break;
         case ROUTE_UPDATE:
-            return RouteController::updateRoute(interface, destination, nexthop, tableType, mtu);
+            ret = RouteController::updateRoute(interface, destination, nexthop, tableType, mtu);
+            if (withDrop) {
+                if (int ret = RouteController::updateRoute(interface, destination, nexthop,
+                                                           RouteController::INTERFACE_DROP,
+                                                           mtu)) {
+                    ALOGE("failed to update drop route for %s (%s)", interface, strerror(ret));
+                }
+            }
+            break;
         case ROUTE_REMOVE:
-            return RouteController::removeRoute(interface, destination, nexthop, tableType,
+            ret = RouteController::removeRoute(interface, destination, nexthop, tableType,
                                                 0 /* priority */);
+            if (withDrop) {
+                if (int ret = RouteController::removeRoute(interface, destination, nexthop,
+                                                           RouteController::INTERFACE_DROP,
+                                                           0 /* priority */)) {
+                    ALOGE("failed to remove drop route for %s (%s)", interface, strerror(ret));
+                }
+            }
+            break;
     }
-    return -EINVAL;
+
+    return ret;
 }
 
 int NetworkController::modifyFallthroughLocked(unsigned vpnNetId, bool add) {

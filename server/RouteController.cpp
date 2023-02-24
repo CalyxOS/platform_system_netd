@@ -134,16 +134,29 @@ static const char* familyName(uint8_t family) {
 
 static void maybeModifyQdiscClsact(const char* interface, bool add);
 
-static uint32_t getRouteTableIndexFromGlobalRouteTableIndex(uint32_t index, bool local) {
-    // The local table is
+static uint32_t getRouteTableIndexFromGlobalRouteTableIndex(uint32_t index,
+                                                            RouteController::TableType tableType) {
+    // If offset is non-zero, use the offset provided instead of the global offset.
+    // e.g. The local table is
     // "global table - ROUTE_TABLE_OFFSET_FROM_INDEX + ROUTE_TABLE_OFFSET_FROM_INDEX_FOR_LOCAL"
-    const uint32_t localTableOffset = RouteController::ROUTE_TABLE_OFFSET_FROM_INDEX_FOR_LOCAL -
-                                      RouteController::ROUTE_TABLE_OFFSET_FROM_INDEX;
-    return local ? index + localTableOffset : index;
+    int offset;
+    switch (tableType) {
+        case RouteController::INTERFACE_LOCAL:
+            offset = RouteController::ROUTE_TABLE_OFFSET_FROM_INDEX_FOR_LOCAL;
+            break;
+        case RouteController::INTERFACE_DROP:
+            offset = RouteController::ROUTE_TABLE_OFFSET_FROM_INDEX_FOR_DROP;
+            break;
+        default:
+            offset = 0;
+    }
+    const uint32_t tableOffset = offset - RouteController::ROUTE_TABLE_OFFSET_FROM_INDEX;
+    return offset ? index + tableOffset : index;
 }
 
 // Caller must hold sInterfaceToTableLock.
-uint32_t RouteController::getRouteTableForInterfaceLocked(const char* interface, bool local) {
+uint32_t RouteController::getRouteTableForInterfaceLocked(const char* interface,
+                                                          TableType tableType) {
     // If we already know the routing table for this interface name, use it.
     // This ensures we can remove rules and routes for an interface that has been removed,
     // or has been removed and re-added with a different interface index.
@@ -158,7 +171,7 @@ uint32_t RouteController::getRouteTableForInterfaceLocked(const char* interface,
     // "global table - ROUTE_TABLE_OFFSET_FROM_INDEX + ROUTE_TABLE_OFFSET_FROM_INDEX_FOR_LOCAL"
     auto iter = sInterfaceToTable.find(interface);
     if (iter != sInterfaceToTable.end()) {
-        return getRouteTableIndexFromGlobalRouteTableIndex(iter->second, local);
+        return getRouteTableIndexFromGlobalRouteTableIndex(iter->second, tableType);
     }
 
     uint32_t index = RouteController::ifNameToIndexFunction(interface);
@@ -168,7 +181,7 @@ uint32_t RouteController::getRouteTableForInterfaceLocked(const char* interface,
     }
     index += RouteController::ROUTE_TABLE_OFFSET_FROM_INDEX;
     sInterfaceToTable[interface] = index;
-    return getRouteTableIndexFromGlobalRouteTableIndex(index, local);
+    return getRouteTableIndexFromGlobalRouteTableIndex(index, tableType);
 }
 
 uint32_t RouteController::getIfIndex(const char* interface) {
@@ -193,9 +206,9 @@ uint32_t RouteController::getIfIndex(const char* interface) {
     return ifindex - ROUTE_TABLE_OFFSET_FROM_INDEX;
 }
 
-uint32_t RouteController::getRouteTableForInterface(const char* interface, bool local) {
+uint32_t RouteController::getRouteTableForInterface(const char* interface, TableType tableType) {
     std::lock_guard lock(sInterfaceToTableLock);
-    return getRouteTableForInterfaceLocked(interface, local);
+    return getRouteTableForInterfaceLocked(interface, tableType);
 }
 
 void addTableName(uint32_t table, const std::string& name, std::string* contents) {
@@ -226,6 +239,11 @@ void RouteController::updateTableNamesFile() {
         // Start from ROUTE_TABLE_OFFSET_FROM_INDEX_FOR_LOCAL plus with the interface table index.
         uint32_t offset = ROUTE_TABLE_OFFSET_FROM_INDEX_FOR_LOCAL - ROUTE_TABLE_OFFSET_FROM_INDEX;
         addTableName(offset + ifIndex, ifName + INTERFACE_LOCAL_SUFFIX, &contents);
+        // Add table for the drop route of the network, used to drop traffic to VPN routes until
+        // the VPN interface's removal has been handled.
+        uint32_t dropOffset = ROUTE_TABLE_OFFSET_FROM_INDEX_FOR_DROP
+                              - ROUTE_TABLE_OFFSET_FROM_INDEX;
+        addTableName(dropOffset + ifIndex, ifName + INTERFACE_DROP_SUFFIX, &contents);
     }
 
     if (!WriteStringToFile(contents, RT_TABLES_PATH, RT_TABLES_MODE, AID_SYSTEM, AID_WIFI)) {
@@ -1055,7 +1073,8 @@ int RouteController::modifyVirtualNetwork(unsigned netId, const char* interface,
                                           const UidRangeMap& uidRangeMap, bool secure, bool add,
                                           bool modifyNonUidBasedRules, bool excludeLocalRoutes) {
     uint32_t table = getRouteTableForInterface(interface, false /* false */);
-    if (table == RT_TABLE_UNSPEC) {
+    uint32_t tableDrop = getRouteTableForInterface(interface, INTERFACE_DROP);
+    if (table == RT_TABLE_UNSPEC || tableDrop == RT_TABLE_UNSPEC) {
         return -ESRCH;
     }
 
@@ -1063,6 +1082,11 @@ int RouteController::modifyVirtualNetwork(unsigned netId, const char* interface,
         for (const UidRangeParcel& range : uidRanges.getRanges()) {
             if (int ret = modifyVpnUidRangeRule(table, range.start, range.stop, subPriority, secure,
                                                 add, excludeLocalRoutes)) {
+                return ret;
+            }
+            if (int ret = modifyVpnUidRangeRule(tableDrop, range.start, range.stop,
+                                                subPriority + INTERFACE_DROP_RULE_SUB_PRIORITY,
+                                                secure, add, excludeLocalRoutes)) {
                 return ret;
             }
             if (int ret = modifyExplicitNetworkRule(netId, table, PERMISSION_NONE, range.start,
@@ -1129,13 +1153,18 @@ int RouteController::modifyTetheredNetwork(uint16_t action, const char* inputInt
 // Returns 0 on success or negative errno on failure.
 int RouteController::modifyRoute(uint16_t action, uint16_t flags, const char* interface,
                                  const char* destination, const char* nexthop, TableType tableType,
-                                 int mtu, int priority, bool isLocal) {
+                                 int mtu, int priority) {
     uint32_t table;
     switch (tableType) {
-        case RouteController::INTERFACE: {
-            table = getRouteTableForInterface(interface, isLocal);
+        case RouteController::INTERFACE:
+        case RouteController::INTERFACE_LOCAL:
+        case RouteController::INTERFACE_DROP: {
+            table = getRouteTableForInterface(interface, tableType);
             if (table == RT_TABLE_UNSPEC) {
                 return -ESRCH;
+            }
+            if (tableType == RouteController::INTERFACE_DROP) {
+                interface = DummyNetwork::INTERFACE_NAME;
             }
             break;
         }
@@ -1236,16 +1265,17 @@ int RouteController::flushRoutes(const char* interface) {
     // Flush local first because flush global routing tables may erase the sInterfaceToTable map.
     // Then the fake <iface>_local interface will be unable to find the index because the local
     // interface depends physical interface to find the correct index.
-    int ret = flushRoutes(interface, true);
-    ret |= flushRoutes(interface, false);
+    int ret = flushRoutes(interface, INTERFACE_LOCAL);
+    ret |= flushRoutes(interface, INTERFACE_DROP);
+    ret |= flushRoutes(interface, INTERFACE);
     return ret;
 }
 
 // Returns 0 on success or negative errno on failure.
-int RouteController::flushRoutes(const char* interface, bool local) {
+int RouteController::flushRoutes(const char* interface, TableType tableType) {
     std::lock_guard lock(sInterfaceToTableLock);
 
-    uint32_t table = getRouteTableForInterfaceLocked(interface, local);
+    uint32_t table = getRouteTableForInterfaceLocked(interface, tableType);
     if (table == RT_TABLE_UNSPEC) {
         return -ESRCH;
     }
@@ -1255,7 +1285,7 @@ int RouteController::flushRoutes(const char* interface, bool local) {
     // If we failed to flush routes, the caller may elect to keep this interface around, so keep
     // track of its name.
     // Skip erasing local fake interface since it does not exist in sInterfaceToTable.
-    if (ret == 0 && !local) {
+    if (ret == 0 && tableType != INTERFACE_LOCAL && tableType != INTERFACE_DROP) {
         sInterfaceToTable.erase(interface);
     }
 

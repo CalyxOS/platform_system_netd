@@ -107,8 +107,11 @@ public:
     static const int ROUTE_TABLE_OFFSET_FROM_INDEX = 1000;
     // Offset for the table of virtual local network created from the physical interface.
     static const int ROUTE_TABLE_OFFSET_FROM_INDEX_FOR_LOCAL = 1000000000;
+    // Offset for the table of VPN routes to drop until the VPN's interface removal is handled.
+    static const int ROUTE_TABLE_OFFSET_FROM_INDEX_FOR_DROP = 500000000;
 
     static constexpr const char* INTERFACE_LOCAL_SUFFIX = "_local";
+    static constexpr const char* INTERFACE_DROP_SUFFIX = "_drop";
     static constexpr const char* RT_TABLES_PATH = "/data/misc/net/rt_tables";
     static const char* const LOCAL_MANGLE_INPUT;
 
@@ -167,11 +170,13 @@ public:
     // route that's blocked), "throw" (to indicate the lack of a match), or a regular IP address.
     [[nodiscard]] static int addRoute(const char* interface, const char* destination,
                                       const char* nexthop, TableType tableType, int mtu,
-                                      int priority);
+                                      int priority, bool hasDrop = true);
     [[nodiscard]] static int removeRoute(const char* interface, const char* destination,
-                                         const char* nexthop, TableType tableType, int priority);
+                                         const char* nexthop, TableType tableType, int priority,
+                                         bool hasDrop = true);
     [[nodiscard]] static int updateRoute(const char* interface, const char* destination,
-                                         const char* nexthop, TableType tableType, int mtu);
+                                         const char* nexthop, TableType tableType, int mtu,
+                                         bool hasDrop = true);
 
     [[nodiscard]] static int enableTethering(const char* inputInterface,
                                              const char* outputInterface);
@@ -213,8 +218,10 @@ public:
     [[nodiscard]] static int flushRoutes(const char* interface, bool local)
             EXCLUDES(sInterfaceToTableLock);
     [[nodiscard]] static int flushRoutes(uint32_t table);
-    static uint32_t getRouteTableForInterfaceLocked(const char* interface, bool local)
+    static uint32_t getRouteTableForInterfaceLocked(const char* interface, int offset)
             REQUIRES(sInterfaceToTableLock);
+    static uint32_t getDropRouteTableForInterface(const char* interface)
+            EXCLUDES(sInterfaceToTableLock);
     static uint32_t getRouteTableForInterface(const char* interface, bool local)
             EXCLUDES(sInterfaceToTableLock);
     static int modifyDefaultNetwork(uint16_t action, const char* interface, Permission permission);
@@ -224,7 +231,7 @@ public:
     static int modifyUnreachableNetwork(unsigned netId, const UidRangeMap& uidRangeMap, bool add);
     static int modifyRoute(uint16_t action, uint16_t flags, const char* interface,
                            const char* destination, const char* nexthop, TableType tableType,
-                           int mtu, int priority, bool isLocal);
+                           int mtu, int priority, bool isLocal, bool hasDrop = true);
     static int modifyTetheredNetwork(uint16_t action, const char* inputInterface,
                                      const char* outputInterface);
     static int modifyVpnFallthroughRule(uint16_t action, unsigned vpnNetId,

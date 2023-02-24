@@ -134,16 +134,16 @@ static const char* familyName(uint8_t family) {
 
 static void maybeModifyQdiscClsact(const char* interface, bool add);
 
-static uint32_t getRouteTableIndexFromGlobalRouteTableIndex(uint32_t index, bool local) {
-    // The local table is
+static uint32_t getRouteTableIndexFromGlobalRouteTableIndex(uint32_t index, int offset) {
+    // If offset is non-zero, use the offset provided instead of the global offset.
+    // e.g. The local table is
     // "global table - ROUTE_TABLE_OFFSET_FROM_INDEX + ROUTE_TABLE_OFFSET_FROM_INDEX_FOR_LOCAL"
-    const uint32_t localTableOffset = RouteController::ROUTE_TABLE_OFFSET_FROM_INDEX_FOR_LOCAL -
-                                      RouteController::ROUTE_TABLE_OFFSET_FROM_INDEX;
-    return local ? index + localTableOffset : index;
+    const uint32_t tableOffset = offset - RouteController::ROUTE_TABLE_OFFSET_FROM_INDEX;
+    return offset ? index + tableOffset : index;
 }
 
 // Caller must hold sInterfaceToTableLock.
-uint32_t RouteController::getRouteTableForInterfaceLocked(const char* interface, bool local) {
+uint32_t RouteController::getRouteTableForInterfaceLocked(const char* interface, int offset) {
     // If we already know the routing table for this interface name, use it.
     // This ensures we can remove rules and routes for an interface that has been removed,
     // or has been removed and re-added with a different interface index.
@@ -158,7 +158,7 @@ uint32_t RouteController::getRouteTableForInterfaceLocked(const char* interface,
     // "global table - ROUTE_TABLE_OFFSET_FROM_INDEX + ROUTE_TABLE_OFFSET_FROM_INDEX_FOR_LOCAL"
     auto iter = sInterfaceToTable.find(interface);
     if (iter != sInterfaceToTable.end()) {
-        return getRouteTableIndexFromGlobalRouteTableIndex(iter->second, local);
+        return getRouteTableIndexFromGlobalRouteTableIndex(iter->second, offset);
     }
 
     uint32_t index = RouteController::ifNameToIndexFunction(interface);
@@ -168,7 +168,7 @@ uint32_t RouteController::getRouteTableForInterfaceLocked(const char* interface,
     }
     index += RouteController::ROUTE_TABLE_OFFSET_FROM_INDEX;
     sInterfaceToTable[interface] = index;
-    return getRouteTableIndexFromGlobalRouteTableIndex(index, local);
+    return getRouteTableIndexFromGlobalRouteTableIndex(index, offset);
 }
 
 uint32_t RouteController::getIfIndex(const char* interface) {
@@ -193,9 +193,16 @@ uint32_t RouteController::getIfIndex(const char* interface) {
     return ifindex - ROUTE_TABLE_OFFSET_FROM_INDEX;
 }
 
+uint32_t RouteController::getDropRouteTableForInterface(const char* interface) {
+    std::lock_guard lock(sInterfaceToTableLock);
+    const int offset = RouteController::ROUTE_TABLE_OFFSET_FROM_INDEX_FOR_DROP;
+    return getRouteTableForInterfaceLocked(interface, offset);
+}
+
 uint32_t RouteController::getRouteTableForInterface(const char* interface, bool local) {
     std::lock_guard lock(sInterfaceToTableLock);
-    return getRouteTableForInterfaceLocked(interface, local);
+    const int offset = local ? RouteController::ROUTE_TABLE_OFFSET_FROM_INDEX_FOR_LOCAL : 0;
+    return getRouteTableForInterfaceLocked(interface, offset);
 }
 
 void addTableName(uint32_t table, const std::string& name, std::string* contents) {
@@ -226,6 +233,11 @@ void RouteController::updateTableNamesFile() {
         // Start from ROUTE_TABLE_OFFSET_FROM_INDEX_FOR_LOCAL plus with the interface table index.
         uint32_t offset = ROUTE_TABLE_OFFSET_FROM_INDEX_FOR_LOCAL - ROUTE_TABLE_OFFSET_FROM_INDEX;
         addTableName(offset + ifIndex, ifName + INTERFACE_LOCAL_SUFFIX, &contents);
+        // Add table for the drop route of the network, used to drop traffic to VPN routes until
+        // the VPN interface's removal has been handled.
+        uint32_t drop_offset = ROUTE_TABLE_OFFSET_FROM_INDEX_FOR_DROP
+                               - ROUTE_TABLE_OFFSET_FROM_INDEX;
+        addTableName(drop_offset + ifIndex, ifName + INTERFACE_DROP_SUFFIX, &contents);
     }
 
     if (!WriteStringToFile(contents, RT_TABLES_PATH, RT_TABLES_MODE, AID_SYSTEM, AID_WIFI)) {
@@ -1055,7 +1067,8 @@ int RouteController::modifyVirtualNetwork(unsigned netId, const char* interface,
                                           const UidRangeMap& uidRangeMap, bool secure, bool add,
                                           bool modifyNonUidBasedRules, bool excludeLocalRoutes) {
     uint32_t table = getRouteTableForInterface(interface, false /* false */);
-    if (table == RT_TABLE_UNSPEC) {
+    uint32_t table_drop = getDropRouteTableForInterface(interface);
+    if (table == RT_TABLE_UNSPEC || table_drop == RT_TABLE_UNSPEC) {
         return -ESRCH;
     }
 
@@ -1063,6 +1076,10 @@ int RouteController::modifyVirtualNetwork(unsigned netId, const char* interface,
         for (const UidRangeParcel& range : uidRanges.getRanges()) {
             if (int ret = modifyVpnUidRangeRule(table, range.start, range.stop, subPriority, secure,
                                                 add, excludeLocalRoutes)) {
+                return ret;
+            }
+            if (int ret = modifyVpnUidRangeRule(table_drop, range.start, range.stop,
+                                                subPriority + 1, secure, add, excludeLocalRoutes)) {
                 return ret;
             }
             if (int ret = modifyExplicitNetworkRule(netId, table, PERMISSION_NONE, range.start,
@@ -1129,13 +1146,20 @@ int RouteController::modifyTetheredNetwork(uint16_t action, const char* inputInt
 // Returns 0 on success or negative errno on failure.
 int RouteController::modifyRoute(uint16_t action, uint16_t flags, const char* interface,
                                  const char* destination, const char* nexthop, TableType tableType,
-                                 int mtu, int priority, bool isLocal) {
+                                 int mtu, int priority, bool isLocal, bool hasDrop) {
     uint32_t table;
+    uint32_t table_drop = RT_TABLE_UNSPEC;
     switch (tableType) {
         case RouteController::INTERFACE: {
             table = getRouteTableForInterface(interface, isLocal);
             if (table == RT_TABLE_UNSPEC) {
                 return -ESRCH;
+            }
+            if (hasDrop) {
+                table_drop = getDropRouteTableForInterface(interface);
+                if (table_drop == RT_TABLE_UNSPEC) {
+                    return -ESRCH;
+                }
             }
             break;
         }
@@ -1157,6 +1181,12 @@ int RouteController::modifyRoute(uint16_t action, uint16_t flags, const char* in
     // Trying to add a route that already exists shouldn't cause an error.
     if (ret && !(action == RTM_NEWROUTE && ret == -EEXIST)) {
         return ret;
+    }
+
+    if (table_drop != RT_TABLE_UNSPEC) {
+        // Equivalent route with dummy interface is modified for the drop table.
+        ret = modifyIpRoute(action, flags, table_drop, DummyNetwork::INTERFACE_NAME, destination,
+                            nexthop, mtu, priority);
     }
 
     return 0;
@@ -1430,9 +1460,9 @@ bool RouteController::isLocalRoute(TableType tableType, const char* destination,
 }
 
 int RouteController::addRoute(const char* interface, const char* destination, const char* nexthop,
-                              TableType tableType, int mtu, int priority) {
+                              TableType tableType, int mtu, int priority, bool hasDrop) {
     if (int ret = modifyRoute(RTM_NEWROUTE, NETLINK_ROUTE_CREATE_FLAGS, interface, destination,
-                              nexthop, tableType, mtu, priority, false /* isLocal */)) {
+                              nexthop, tableType, mtu, priority, false /* isLocal */, hasDrop)) {
         return ret;
     }
 
@@ -1445,9 +1475,10 @@ int RouteController::addRoute(const char* interface, const char* destination, co
 }
 
 int RouteController::removeRoute(const char* interface, const char* destination,
-                                 const char* nexthop, TableType tableType, int priority) {
+                                 const char* nexthop, TableType tableType, int priority,
+                                 bool hasDrop) {
     if (int ret = modifyRoute(RTM_DELROUTE, NETLINK_REQUEST_FLAGS, interface, destination, nexthop,
-                              tableType, 0 /* mtu */, priority, false /* isLocal */)) {
+                              tableType, 0 /* mtu */, priority, false /* isLocal */, hasDrop)) {
         return ret;
     }
 
@@ -1459,9 +1490,10 @@ int RouteController::removeRoute(const char* interface, const char* destination,
 }
 
 int RouteController::updateRoute(const char* interface, const char* destination,
-                                 const char* nexthop, TableType tableType, int mtu) {
+                                 const char* nexthop, TableType tableType, int mtu, bool hasDrop) {
     if (int ret = modifyRoute(RTM_NEWROUTE, NETLINK_ROUTE_REPLACE_FLAGS, interface, destination,
-                              nexthop, tableType, mtu, 0 /* priority */, false /* isLocal */)) {
+                              nexthop, tableType, mtu, 0 /* priority */, false /* isLocal */,
+                              hasDrop)) {
         return ret;
     }
 

@@ -458,9 +458,6 @@ int NetworkController::createVirtualNetwork(unsigned netId, bool secure, NativeV
         return -EINVAL;
     }
 
-    if (int ret = modifyFallthroughLocked(netId, true)) {
-        return ret;
-    }
     mNetworks[netId] = new VirtualNetwork(netId, secure, excludeLocalRoutes);
     return 0;
 }
@@ -494,12 +491,6 @@ int NetworkController::destroyNetwork(unsigned netId) {
             }
         }
         mDefaultNetId = NETID_UNSET;
-    } else if (network->isVirtual()) {
-        if (int err = modifyFallthroughLocked(netId, false)) {
-            if (!ret) {
-                ret = err;
-            }
-        }
     }
     mNetworks.erase(netId);
     delete network;

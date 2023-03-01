@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c023bbef_0f5d3439",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1000002
+      },
+      "writtenOn": "2023-03-01T22:36:45Z",
+      "side": 1,
+      "message": "Might need a bit more explaining the reason why.\nIs the goal to prevent UIDs from accessing networks that local exclusion rules would otherwise allow them to?",
+      "range": {
+        "startLine": 9,
+        "startChar": 0,
+        "endLine": 10,
+        "endChar": 36
+      },
+      "revId": "50021b8bec67b0292b8be23ab2b4c64005f778cf",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    }
+  ]
+}

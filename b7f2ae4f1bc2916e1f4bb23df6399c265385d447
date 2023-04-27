@@ -16,6 +16,24 @@
       "message": "Still confirming behavior...",
       "revId": "b7f2ae4f1bc2916e1f4bb23df6399c265385d447",
       "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "649ca469_5dd17ea6",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000062
+      },
+      "writtenOn": "2023-04-27T22:26:03Z",
+      "side": 1,
+      "message": "This doesn\u0027t fix what I thought it would fix, but it potentially allows UIDs to take advantage of default network rules. I\u0027m not sure an easy way to test that, but this code does do what it says it does, and it is needed if we do If5493deb",
+      "parentUuid": "bb484016_c448358c",
+      "revId": "b7f2ae4f1bc2916e1f4bb23df6399c265385d447",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
     }
   ]
 }

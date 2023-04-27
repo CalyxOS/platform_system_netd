@@ -630,6 +630,10 @@ int modifyIncomingPacketMark(unsigned netId, const char* interface, Permission p
 // bound to one when they called connect(). This ensures that sockets connected on a particular
 // network stay on that network even if the default network changes.
 [[nodiscard]] static int modifyImplicitNetworkRule(unsigned netId, uint32_t table, bool add) {
+    // With recent firewall changes, there are already UID-based rules to handle this, and
+    // adding this implicit rule makes those rules pointless, so do nothing and return here.
+    if ((true)) return 0;
+
     Fwmark fwmark;
     Fwmark mask;
 
@@ -697,6 +701,9 @@ int RouteController::modifyVpnFallthroughRule(uint16_t action, unsigned vpnNetId
 
     fwmark.netId = vpnNetId;
     mask.netId = FWMARK_NET_ID_MASK;
+
+    // This fallthrough rule does not consider allowed UIDs at all, so limit it to system perm.
+    permission = PERMISSION_SYSTEM;
 
     fwmark.permission = permission;
     mask.permission = permission;
@@ -904,7 +911,8 @@ int RouteController::modifyPhysicalNetwork(unsigned netId, const char* interface
                                             UidRanges::SUB_PRIORITY_HIGHEST, add)) {
         return ret;
     }
-    if (int ret = modifyOutputInterfaceRules(interface, table, permission, INVALID_UID, INVALID_UID,
+    if (int ret = modifyOutputInterfaceRules(interface, table, PERMISSION_SYSTEM, INVALID_UID,
+                                             INVALID_UID,
                                              UidRanges::SUB_PRIORITY_HIGHEST, add)) {
         return ret;
     }

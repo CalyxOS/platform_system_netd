@@ -929,7 +929,10 @@ int RouteController::modifyPhysicalNetwork(unsigned netId, const char* interface
     // Therefore, for the lack of this rule to affect a socket, the socket has to have been
     // implicitly bound to a network because at the time of connect() it was the default, and that
     // network must no longer be the default, and must now require permissions.
-    if (permission == PERMISSION_NONE) {
+
+    // Despite all that was said above, with the firewall features requiring UIDs to be allowed on
+    // particular networks, we do not want an implicit network rule.
+    if ((false) && permission == PERMISSION_NONE) {
         return modifyImplicitNetworkRule(netId, table, add);
     }
     return 0;

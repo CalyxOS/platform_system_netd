@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "742c843b_2bf8d3b2",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000062
+      },
+      "writtenOn": "2023-04-27T22:18:15Z",
+      "side": 1,
+      "message": "Oliver, you\u0027re more familiar with bypassable VPNs than I am. Does this seem accurate, or are there any VPNs / things that you would recommend trying? I have been trying with RethinkDNS in DNS only mode, bypassable, and accessing graph.facebook.com, which appropriately fails to connect, but does not fail when Rethink is off.",
+      "revId": "cd747b6d15344c3c68e993dc1022d79387322b32",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    }
+  ]
+}

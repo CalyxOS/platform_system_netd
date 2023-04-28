@@ -34,6 +34,24 @@
       "parentUuid": "742c843b_2bf8d3b2",
       "revId": "cd747b6d15344c3c68e993dc1022d79387322b32",
       "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4576d8d0_3adbf6cb",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000062
+      },
+      "writtenOn": "2023-04-28T14:42:49Z",
+      "side": 1,
+      "message": "Ack, and since bypassable VPNs are already not functioning properly in the popular use cases that we know about, then as far as I can tell, at worst, this change would exchange one problem for another (as-yet-unknown) one that shouldn\u0027t be any worse than the one we do know about.",
+      "parentUuid": "32bbc5fd_e0135386",
+      "revId": "cd747b6d15344c3c68e993dc1022d79387322b32",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
     }
   ]
 }

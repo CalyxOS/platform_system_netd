@@ -16,6 +16,24 @@
       "message": "Nit: Mind updating the comment too then?\n\nCould be worth checking to see what AOSP says as well, maybe an email to the @google.com who touched it, or perhaps someone from OWNERS",
       "revId": "2eee5bb5daa95c0635af47cde696f1ea8c131b8e",
       "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9bfe4947_e6ff9e89",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1000062
+      },
+      "writtenOn": "2023-05-01T19:01:58Z",
+      "side": 1,
+      "message": "Ack, I would update the comment if I understood why it behaves the way it does. Right now, I know we found breakage, found comments that seem inaccurate, and found something that fixes it. Updating the comment to say \"this is wrong actually\" without providing an explanation might not be very useful...?\n\nI know this is just a nit anyway.",
+      "parentUuid": "7a731027_3a7e4d5b",
+      "revId": "2eee5bb5daa95c0635af47cde696f1ea8c131b8e",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
     }
   ]
 }

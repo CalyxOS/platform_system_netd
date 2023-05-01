@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7a731027_3a7e4d5b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2023-05-01T18:35:19Z",
+      "side": 1,
+      "message": "Nit: Mind updating the comment too then?\n\nCould be worth checking to see what AOSP says as well, maybe an email to the @google.com who touched it, or perhaps someone from OWNERS",
+      "revId": "2eee5bb5daa95c0635af47cde696f1ea8c131b8e",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    }
+  ]
+}

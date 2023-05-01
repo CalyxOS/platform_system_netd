@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "64c5b9bc_5ab48c2e",
+        "filename": "server/RouteController.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 651,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2023-05-01T18:34:01Z",
+      "side": 1,
+      "message": "Nit: Can you just stub out the entire method / drop the above lines? That\u0027s what we do for AOSP changes, and that will help by having conflicts whenever upstream changes this.\n\nThis `if ((true)) return 0;` is more of a Bromite / Chromium patch thing - makes rebasing conflict free, but we don\u0027t mind that here.",
+      "revId": "874406b1caf49a4931ebdcd5a5ddbe42f1eef5d3",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    }
+  ]
+}

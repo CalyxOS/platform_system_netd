@@ -1065,6 +1065,9 @@ int RouteController::modifyDefaultNetwork(uint16_t action, const char* interface
     fwmark.netId = NETID_UNSET;
     mask.netId = FWMARK_NET_ID_MASK;
 
+    // This default network rule does not consider allowed UIDs at all, so limit it to system perm.
+    permission = PERMISSION_SYSTEM;
+
     fwmark.permission = permission;
     mask.permission = permission;
 

@@ -16,6 +16,23 @@
       "message": "Need to verify",
       "revId": "6ec1b98842610f8d43d9217c8506130c9a6f2d4e",
       "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9c01368b_2893d3b4",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000062
+      },
+      "writtenOn": "2023-07-10T18:46:33Z",
+      "side": 1,
+      "message": "Example `ip rule` output, where wlan access is turned off for UID 10207:\n\n```\n[...]\n29998:\tfrom all fwmark 0x0/0xffff iif lo uidrange 0-10206 lookup wlan0 \n29998:\tfrom all fwmark 0x0/0xffff iif lo uidrange 10208-2147483647 lookup wlan0 \n31000:\tfrom all fwmark 0xc0000/0xcffff iif lo lookup wlan0\n```\n\nNow, the 31000 rule uses `fwmark 0xc0000/0xcffff` so it only works for system-permission apps, instead of `fwmark 0x0/0xffff` like the others (how it was before), which was making the UID-based default network rules pointless, restricting nothing.",
+      "revId": "6ec1b98842610f8d43d9217c8506130c9a6f2d4e",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
     }
   ]
 }

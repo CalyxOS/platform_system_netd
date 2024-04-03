@@ -94,6 +94,9 @@ cc_defaults {
     include_dirs: [
         "system/netd/include",
     ],
+    header_libs: [
+        "bpf_headers",
+    ],
     shared_libs: [
         "android.system.net.netd@1.0",
         "android.system.net.netd@1.1",

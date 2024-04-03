@@ -36,7 +36,9 @@
 #include <android/binder_process.h>
 #include <binder/IPCThreadState.h>
 #include <binder/IServiceManager.h>
+#include <bpf/WaitForProgsLoaded.h>
 #include <hidl/HidlTransportSupport.h>
+#include <linux/bpf.h>
 #include <netdutils/Stopwatch.h>
 #include <processgroup/processgroup.h>
 
@@ -51,10 +53,13 @@
 #include "NetlinkManager.h"
 #include "Process.h"
 
+#include "BpfSyscallWrappers.h"
 #include "NetdUpdatablePublic.h"
 #include "netd_resolv/resolv.h"
 
 using android::IPCThreadState;
+using android::base::unique_fd;
+using android::bpf::retrieveProgram;
 using android::sp;
 using android::status_t;
 using android::String16;
@@ -69,6 +74,8 @@ using android::net::NetlinkManager;
 using android::net::NFLogListener;
 using android::net::aidl::NetdHwAidlService;
 using android::netdutils::Stopwatch;
+using android::netdutils::Status;
+using android::netdutils::statusFromErrno;
 
 const char* const PID_FILE_PATH = "/data/misc/net/netd_pid";
 constexpr const char DNSPROXYLISTENER_SOCKET_NAME[] = "dnsproxyd";
@@ -142,6 +149,22 @@ int main() {
         ALOGE("Failed to find cgroup v2 root %s", strerror(errno));
         exit(1);
     }
+
+    android::bpf::waitForProgsLoaded();
+    ALOGI("BPF programs are loaded");
+
+    unique_fd cg_fd(open(cg2_path.c_str(), O_DIRECTORY | O_RDONLY | O_CLOEXEC));
+    ALOGI("attachProgramToCgroup started");
+    unique_fd cgroupProg(retrieveProgram("/sys/fs/bpf/netd_shared/prog_firewall_cgroupsock_inet_create"));
+    if (!cgroupProg.ok()) {
+        ALOGE("attachProgramToCgroup not ok");
+        exit(1);
+    }
+    if (android::bpf::attachProgram(BPF_CGROUP_INET_SOCK_CREATE, cgroupProg, cg_fd, BPF_F_ALLOW_MULTI)) {
+        ALOGE("attachProgramToCgroup failed");
+        exit(1);
+    }
+    gLog.info("firewall_init success");
 
     if (libnetd_updatable_init(cg2_path.c_str())) {
         ALOGE("libnetd_updatable_init failed");

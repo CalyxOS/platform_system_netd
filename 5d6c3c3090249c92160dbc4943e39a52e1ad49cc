@@ -16,6 +16,29 @@
       "message": "Requires permissive selinux due to unfixed denials atm",
       "revId": "5d6c3c3090249c92160dbc4943e39a52e1ad49cc",
       "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bb9ea20e_7f41f7fc",
+        "filename": "bpf_progs/firewall.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 675,
+      "author": {
+        "id": 1000002
+      },
+      "writtenOn": "2024-04-06T02:37:51Z",
+      "side": 1,
+      "message": "This file is a copy of netd.c except for these lines. Change the UID to match whatever applications are being tested",
+      "range": {
+        "startLine": 673,
+        "startChar": 0,
+        "endLine": 675,
+        "endChar": 5
+      },
+      "revId": "5d6c3c3090249c92160dbc4943e39a52e1ad49cc",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
     }
   ],
   "submitRequirementResults": [

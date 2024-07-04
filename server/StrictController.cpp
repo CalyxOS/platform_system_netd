@@ -139,6 +139,9 @@ int StrictController::setupIptablesHooks(void) {
     CMD_V4V6("-A %s -p udp --sport 5353 --dport 5353 -m owner --uid-owner 1020 -j RETURN",
              LOCAL_CLEAR_DETECT)
 
+    // Exempt HTTP/3 (QUIC) payloads
+    CMD_V4V6("-A %s -p udp --dport 80 -m owner --uid-owner 0 -j RETURN", LOCAL_CLEAR_DETECT)
+
     CMD_V4V6("-A %s -p udp -j %s", LOCAL_CLEAR_DETECT, LOCAL_CLEAR_CAUGHT);
     CMD_V4V6("COMMIT\n");
 

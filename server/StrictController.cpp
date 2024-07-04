@@ -28,6 +28,7 @@
 
 #include <android-base/stringprintf.h>
 #include <android-base/strings.h>
+#include <android-base/properties.h>
 
 #include "ConnmarkFlags.h"
 #include "NetdConstants.h"
@@ -41,6 +42,7 @@ const char* StrictController::LOCAL_CLEAR_CAUGHT = "st_clear_caught";
 const char* StrictController::LOCAL_PENALTY_LOG = "st_penalty_log";
 const char* StrictController::LOCAL_PENALTY_REJECT = "st_penalty_reject";
 
+using android::base::GetProperty;
 using android::base::Join;
 using android::base::StringPrintf;
 
@@ -81,10 +83,14 @@ int StrictController::setupIptablesHooks(void) {
     CMD_V4V6("-A %s -j NFLOG --nflog-group 0", LOCAL_PENALTY_REJECT);
     CMD_V4V6("-A %s -j REJECT", LOCAL_PENALTY_REJECT);
 
-    // We use a high-order mark bit to keep track of connections that we've already resolved.
-    // Quickly skip connections that we've already resolved
-    CMD_V4V6("-A %s -m connmark --mark %s -j REJECT", LOCAL_CLEAR_DETECT, connmarkFlagTestReject);
-    CMD_V4V6("-A %s -m connmark --mark %s -j RETURN", LOCAL_CLEAR_DETECT, connmarkFlagTestAccept);
+    if (GetProperty("persist.sys.global.cleartext", "-1") == "-1") {
+        // We use a high-order mark bit to keep track of connections that we've already resolved.
+        // Quickly skip connections that we've already resolved
+        CMD_V4V6("-A %s -m connmark --mark %s -j REJECT", LOCAL_CLEAR_DETECT,
+                 connmarkFlagTestReject);
+        CMD_V4V6("-A %s -m connmark --mark %s -j RETURN", LOCAL_CLEAR_DETECT,
+                 connmarkFlagTestAccept);
+    }
 
     // Look for IPv4 TCP/UDP connections with TLS/DTLS header
     const char *u32;

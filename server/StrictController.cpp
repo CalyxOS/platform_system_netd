@@ -129,6 +129,12 @@ int StrictController::setupIptablesHooks(void) {
     // Exempt DoH payloads
     CMD_V4V6("-A %s -p udp --dport 443 -m owner --uid-owner 0 -j RETURN", LOCAL_CLEAR_DETECT)
 
+    // Exempt NTP payloads
+    CMD_V4V6("-A %s -p udp --dport 123 -m owner --uid-owner %d -j RETURN", LOCAL_CLEAR_DETECT,
+             AID_SYSTEM)
+    CMD_V4V6("-A %s -p udp --dport 123 -m owner --uid-owner %d -j RETURN", LOCAL_CLEAR_DETECT,
+             AID_GPS)
+
     CMD_V4V6("-A %s -p udp -j %s", LOCAL_CLEAR_DETECT, LOCAL_CLEAR_CAUGHT);
     CMD_V4V6("COMMIT\n");
 

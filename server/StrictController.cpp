@@ -139,6 +139,10 @@ int StrictController::setupIptablesHooks(void) {
     CMD_V4V6("-A %s -p udp --dport 123 -m owner --uid-owner 1000 -j RETURN", LOCAL_CLEAR_DETECT)
     CMD_V4V6("-A %s -p udp --dport 123 -m owner --uid-owner 1021 -j RETURN", LOCAL_CLEAR_DETECT)
 
+    // Exempt hotspot & tethering
+    CMD_V4V6("-A %s -p udp --sport 67 --dport 68 -m owner --uid-owner 1073 -j RETURN",
+             LOCAL_CLEAR_DETECT)
+
     CMD_V4V6("-A %s -p udp -j %s", LOCAL_CLEAR_DETECT, LOCAL_CLEAR_CAUGHT);
     CMD_V4V6("COMMIT\n");
 

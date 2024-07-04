@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "204390ac_8992ed5f",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2024-07-04T16:02:55Z",
+      "side": 1,
+      "message": "This in theory can do more than that, but in practice it may not.",
+      "revId": "44a3253ecd1a783a13a1cb8870b0a1201517d31d",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    }
+  ]
+}

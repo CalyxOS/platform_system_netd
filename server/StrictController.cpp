@@ -135,6 +135,10 @@ int StrictController::setupIptablesHooks(void) {
     CMD_V4V6("-A %s -p udp --sport 67 --dport 68 -m owner --uid-owner 1073 -j RETURN",
              LOCAL_CLEAR_DETECT)
 
+    // Exempt mDNS
+    CMD_V4V6("-A %s -p udp --sport 5353 --dport 5353 -m owner --uid-owner 1020 -j RETURN",
+             LOCAL_CLEAR_DETECT)
+
     CMD_V4V6("-A %s -p udp -j %s", LOCAL_CLEAR_DETECT, LOCAL_CLEAR_CAUGHT);
     CMD_V4V6("COMMIT\n");
 

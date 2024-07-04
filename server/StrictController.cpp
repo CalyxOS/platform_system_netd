@@ -135,6 +135,10 @@ int StrictController::setupIptablesHooks(void) {
     // Exempt HTTP/3 (QUIC) payloads (e.g. DoH)
     CMD_V4V6("-A %s -p udp --dport 443 -j RETURN", LOCAL_CLEAR_DETECT)
 
+    // Exempt NTP payloads
+    CMD_V4V6("-A %s -p udp --dport 123 -m owner --uid-owner 1000 -j RETURN", LOCAL_CLEAR_DETECT)
+    CMD_V4V6("-A %s -p udp --dport 123 -m owner --uid-owner 1021 -j RETURN", LOCAL_CLEAR_DETECT)
+
     CMD_V4V6("-A %s -p udp -j %s", LOCAL_CLEAR_DETECT, LOCAL_CLEAR_CAUGHT);
     CMD_V4V6("COMMIT\n");
 

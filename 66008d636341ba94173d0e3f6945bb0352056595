@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5b2da6e0_111da184",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2024-07-04T16:04:10Z",
+      "side": 1,
+      "message": "This is the most restrictive of the bunch so far and thus it\u0027s highly likely that this is all that\u0027s allowed.\n\nBut the comment says \"USB tethering\", commit message says hotspot - can you bring them in sync",
+      "revId": "66008d636341ba94173d0e3f6945bb0352056595",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    }
+  ]
+}

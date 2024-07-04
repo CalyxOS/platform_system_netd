@@ -73,46 +73,36 @@ int StrictController::setupIptablesHooks(void) {
     CMD_V4V6("*filter");
 
     // Chain triggered when cleartext socket detected and penalty is log
-    CMD_V4V6("-A %s -j CONNMARK --or-mark %s", LOCAL_PENALTY_LOG, connmarkFlagAccept);
     CMD_V4V6("-A %s -j NFLOG --nflog-group 0", LOCAL_PENALTY_LOG);
 
     // Chain triggered when cleartext socket detected and penalty is reject
-    CMD_V4V6("-A %s -j CONNMARK --or-mark %s", LOCAL_PENALTY_REJECT, connmarkFlagReject);
     CMD_V4V6("-A %s -j NFLOG --nflog-group 0", LOCAL_PENALTY_REJECT);
     CMD_V4V6("-A %s -j REJECT", LOCAL_PENALTY_REJECT);
-
-    // We use a high-order mark bit to keep track of connections that we've already resolved.
-    // Quickly skip connections that we've already resolved
-    CMD_V4V6("-A %s -m connmark --mark %s -j REJECT", LOCAL_CLEAR_DETECT, connmarkFlagTestReject);
-    CMD_V4V6("-A %s -m connmark --mark %s -j RETURN", LOCAL_CLEAR_DETECT, connmarkFlagTestAccept);
 
     // Look for IPv4 TCP/UDP connections with TLS/DTLS header
     const char *u32;
     u32 = "0>>22&0x3C@ 12>>26&0x3C@ 0&0xFFFF0000=0x16030000 &&"
           "0>>22&0x3C@ 12>>26&0x3C@ 4&0x00FF0000=0x00010000";
-    CMD_V4("-A %s -p tcp -m u32 --u32 \"%s\" -j CONNMARK --or-mark %s",
-           LOCAL_CLEAR_DETECT, u32, connmarkFlagAccept);
+    CMD_V4("-A %s -p tcp -m u32 --u32 \"%s\" -j RETURN",
+           LOCAL_CLEAR_DETECT, u32);
 
     u32 = "0>>22&0x3C@ 8&0xFFFF0000=0x16FE0000 &&"
           "0>>22&0x3C@ 20&0x00FF0000=0x00010000";
-    CMD_V4("-A %s -p udp -m u32 --u32 \"%s\" -j CONNMARK --or-mark %s",
-           LOCAL_CLEAR_DETECT, u32, connmarkFlagAccept);
+    CMD_V4("-A %s -p udp -m u32 --u32 \"%s\" -j RETURN",
+           LOCAL_CLEAR_DETECT, u32);
 
     // Look for IPv6 TCP/UDP connections with TLS/DTLS header.  The IPv6 header
     // doesn't have an IHL field to shift with, so we have to manually add in
     // the 40-byte offset at every step.
     u32 = "52>>26&0x3C@ 40&0xFFFF0000=0x16030000 &&"
           "52>>26&0x3C@ 44&0x00FF0000=0x00010000";
-    CMD_V6("-A %s -p tcp -m u32 --u32 \"%s\" -j CONNMARK --or-mark %s",
-           LOCAL_CLEAR_DETECT, u32, connmarkFlagAccept);
+    CMD_V6("-A %s -p tcp -m u32 --u32 \"%s\" -j RETURN",
+           LOCAL_CLEAR_DETECT, u32);
 
     u32 = "48&0xFFFF0000=0x16FE0000 &&"
           "60&0x00FF0000=0x00010000";
-    CMD_V6("-A %s -p udp -m u32 --u32 \"%s\" -j CONNMARK --or-mark %s",
-           LOCAL_CLEAR_DETECT, u32, connmarkFlagAccept);
-
-    // Skip newly classified connections from above
-    CMD_V4V6("-A %s -m connmark --mark %s -j RETURN", LOCAL_CLEAR_DETECT, connmarkFlagTestAccept);
+    CMD_V6("-A %s -p udp -m u32 --u32 \"%s\" -j RETURN",
+           LOCAL_CLEAR_DETECT, u32);
 
     // Handle TCP/UDP payloads that didn't match TLS/DTLS filters above,
     // which means we've probably found cleartext data.  The TCP variant

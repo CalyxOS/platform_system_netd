@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "56e5c0eb_ae9e70b7",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2024-07-04T16:05:15Z",
+      "side": 1,
+      "message": "In reality this also allows HTTP since that\u0027s also port 80. Does root make any other HTTP connections?",
+      "revId": "2345028846f29c431a882465d43ebf61d8f729bd",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "37936c19_f3593c8e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2024-07-04T16:05:15Z",
+      "side": 1,
+      "message": "Chain needs rebasing given the commits abandoned.",
+      "revId": "2345028846f29c431a882465d43ebf61d8f729bd",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    }
+  ]
+}

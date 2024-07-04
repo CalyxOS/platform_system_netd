@@ -81,11 +81,6 @@ int StrictController::setupIptablesHooks(void) {
     CMD_V4V6("-A %s -j NFLOG --nflog-group 0", LOCAL_PENALTY_REJECT);
     CMD_V4V6("-A %s -j REJECT", LOCAL_PENALTY_REJECT);
 
-    // We use a high-order mark bit to keep track of connections that we've already resolved.
-    // Quickly skip connections that we've already resolved
-    CMD_V4V6("-A %s -m connmark --mark %s -j REJECT", LOCAL_CLEAR_DETECT, connmarkFlagTestReject);
-    CMD_V4V6("-A %s -m connmark --mark %s -j RETURN", LOCAL_CLEAR_DETECT, connmarkFlagTestAccept);
-
     // Look for IPv4 TCP/UDP connections with TLS/DTLS header
     const char *u32;
     u32 = "0>>22&0x3C@ 12>>26&0x3C@ 0&0xFFFF0000=0x16030000 &&"

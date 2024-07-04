@@ -108,6 +108,10 @@ int StrictController::setupIptablesHooks(void) {
     // which means we've probably found cleartext data.  The TCP variant
     // depends on u32 returning false when we try reading into the message
     // body to ignore empty ACK packets.
+
+    // Exempt DoT payloads
+    CMD_V4V6("-A %s -p tcp --dport 853 -m owner --uid-owner 0 -j RETURN", LOCAL_CLEAR_DETECT)
+
     u32 = "0>>22&0x3C@ 12>>26&0x3C@ 0&0x0=0x0";
     CMD_V4("-A %s -p tcp -m state --state ESTABLISHED -m u32 --u32 \"%s\" -j %s",
            LOCAL_CLEAR_DETECT, u32, LOCAL_CLEAR_CAUGHT);

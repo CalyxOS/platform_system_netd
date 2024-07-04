@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6ad540ca_9b93a16d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2024-07-04T16:06:45Z",
+      "side": 1,
+      "message": "I\u0027d treat this separate from the rest of the chain - those have a clear and easy to determine effect, whereas this\u0027d have a much higher effect on pretty much everyone.",
+      "revId": "8c7998109520663770fefb058beed1e1c6afebe4",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    }
+  ]
+}

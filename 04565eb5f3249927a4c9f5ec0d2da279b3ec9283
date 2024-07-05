@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "82cff96a_6745ff6a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000109
+      },
+      "writtenOn": "2024-07-05T23:18:54Z",
+      "side": 1,
+      "message": "I notice it references port 443. It seems only HTTP/3 is being allowed here, not other possible QUIC traffic. I\u0027d say it\u0027s better to deal with QUIC in a proper way, or at least remove the QUIC wording and leave just HTTP/3 since it only allows a subset of QUIC traffic.",
+      "revId": "04565eb5f3249927a4c9f5ec0d2da279b3ec9283",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    }
+  ]
+}

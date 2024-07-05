@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "71a47153_b44543af",
+        "filename": "server/StrictController.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2024-07-05T15:27:14Z",
+      "side": 0,
+      "message": "Mentioned in chat, but if we can keep this around conditionally so that the behavior doesn\u0027t change by default / when the \u0027restrict cleartext\u0027 toggle is off, that\u0027d help.",
+      "revId": "148e1a4d2ff4a180634bc9b3b96c87f56f9ff970",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    }
+  ]
+}

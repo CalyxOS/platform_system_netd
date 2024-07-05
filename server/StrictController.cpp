@@ -126,6 +126,9 @@ int StrictController::setupIptablesHooks(void) {
     CMD_V6("-A %s -p tcp -m state --state ESTABLISHED -m u32 --u32 \"%s\" -j %s",
            LOCAL_CLEAR_DETECT, u32, LOCAL_CLEAR_CAUGHT);
 
+    // Exempt DoH payloads
+    CMD_V4V6("-A %s -p udp --dport 443 -m owner --uid-owner 0 -j RETURN", LOCAL_CLEAR_DETECT)
+
     CMD_V4V6("-A %s -p udp -j %s", LOCAL_CLEAR_DETECT, LOCAL_CLEAR_CAUGHT);
     CMD_V4V6("COMMIT\n");
 

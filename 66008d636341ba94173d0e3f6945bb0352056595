@@ -16,6 +16,23 @@
       "message": "This is the most restrictive of the bunch so far and thus it\u0027s highly likely that this is all that\u0027s allowed.\n\nBut the comment says \"USB tethering\", commit message says hotspot - can you bring them in sync",
       "revId": "66008d636341ba94173d0e3f6945bb0352056595",
       "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f8035f5e_ada5eff2",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000002
+      },
+      "writtenOn": "2024-07-05T14:14:01Z",
+      "side": 1,
+      "message": "I think we should hold this since hotspot/tethering clients do not use host\u0027s private DNS and therefore networking is mostly broken for clients since their DNS (cleartext udp) requests are blocked",
+      "revId": "66008d636341ba94173d0e3f6945bb0352056595",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
     }
   ]
 }

@@ -16,6 +16,23 @@
       "message": "Same here, in theory this means anything from shell on port 123 is allowed",
       "revId": "eb2a0a757f2205d756b76ab3c9d7965ecc9dd7d5",
       "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1fc7d235_f2e67977",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000002
+      },
+      "writtenOn": "2024-07-05T14:30:50Z",
+      "side": 1,
+      "message": "System still tries to resolve time.android.com using cleartext dns which fails",
+      "revId": "eb2a0a757f2205d756b76ab3c9d7965ecc9dd7d5",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
     }
   ]
 }

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6ca8dafb_676b1d81",
+        "filename": "server/StrictController.cpp",
+        "patchSetId": 6
+      },
+      "lineNbr": 137,
+      "author": {
+        "id": 1000062
+      },
+      "writtenOn": "2024-07-08T15:17:55Z",
+      "side": 1,
+      "message": "Can we add a constant (or utilize an existing one) for this UID, referencing what to \"sync with\"? Just in case AOSP ever changes things, it\u0027ll be easier to notice, hopefully.",
+      "revId": "5d445d3546ec0d2a0c72900e39fe4be761651cc6",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    }
+  ]
+}

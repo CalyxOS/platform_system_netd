@@ -52,6 +52,24 @@
       "parentUuid": "78a311e4_40864fac",
       "revId": "afe28eeef8aea0524683db0be1e2cad035909734",
       "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ba65202d_1baf9185",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000062
+      },
+      "writtenOn": "2024-07-08T15:35:51Z",
+      "side": 1,
+      "message": "Thanks, and I was wrong, the rejection happens below, on line 123+.\n\nHere\u0027s a link to our discussion about the viability of this: https://gitlab.com/CalyxOS/calyxos/-/issues/2533#note_1983133244",
+      "parentUuid": "352164c1_0d2deb83",
+      "revId": "afe28eeef8aea0524683db0be1e2cad035909734",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
     }
   ]
 }

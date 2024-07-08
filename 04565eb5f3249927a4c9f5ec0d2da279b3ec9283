@@ -16,6 +16,24 @@
       "message": "I notice it references port 443. It seems only HTTP/3 is being allowed here, not other possible QUIC traffic. I\u0027d say it\u0027s better to deal with QUIC in a proper way, or at least remove the QUIC wording and leave just HTTP/3 since it only allows a subset of QUIC traffic.",
       "revId": "04565eb5f3249927a4c9f5ec0d2da279b3ec9283",
       "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7bb481db_29bddcab",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000062
+      },
+      "writtenOn": "2024-07-08T15:02:45Z",
+      "side": 1,
+      "message": "We\u0027re still not sure that we can reliably detect QUIC in a \"proper\" way (it\u0027s looking unlikely):\n- [A Quick Look at QUIC Censorship | OONI](https://ooni.org/post/2022-quick-look-quic-censorship/)\n- [HTTP/3 and QUIC Censorship Circumvention - kelmenhorst](https://github.com/kelmenhorst/quic-censorship/blob/main/evade.md)",
+      "parentUuid": "82cff96a_6745ff6a",
+      "revId": "04565eb5f3249927a4c9f5ec0d2da279b3ec9283",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
     }
   ]
 }

@@ -34,6 +34,24 @@
       "parentUuid": "82cff96a_6745ff6a",
       "revId": "04565eb5f3249927a4c9f5ec0d2da279b3ec9283",
       "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1043cc41_f4561394",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000062
+      },
+      "writtenOn": "2024-07-08T15:32:07Z",
+      "side": 1,
+      "message": "To be clear, to resist censorship you also need to resist identification, and QUIC has features for that. This complicates our ability to *allow* it, in an allowlist scenario, which is how this feature operates.",
+      "parentUuid": "7bb481db_29bddcab",
+      "revId": "04565eb5f3249927a4c9f5ec0d2da279b3ec9283",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
     }
   ]
 }

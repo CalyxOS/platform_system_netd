@@ -33,6 +33,24 @@
       "message": "This is too broad.",
       "revId": "4e1b2120045c99e811591c04cd08df585357195c",
       "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cb80dc4b_8b6afe61",
+        "filename": "server/StrictController.cpp",
+        "patchSetId": 5
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 1000062
+      },
+      "writtenOn": "2024-07-08T15:32:07Z",
+      "side": 1,
+      "message": "If we just wanted to fix DoH as Android implements it, but nothing else, we could make this only affect particular UIDs only (and change the commit message). HTTP/3 and QUIC would still be unavailable for other apps, which should (if being reasonable) fall back to pre-HTTP/3 TCP connections, likely without the app developer even needing to do anything to make this fallback happen.",
+      "parentUuid": "f2f9d255_179fef87",
+      "revId": "4e1b2120045c99e811591c04cd08df585357195c",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
     }
   ]
 }

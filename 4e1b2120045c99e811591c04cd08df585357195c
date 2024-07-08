@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "713802e6_bd41e580",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2024-07-08T15:02:14Z",
+      "side": 1,
+      "message": "This is way too broad.",
+      "revId": "4e1b2120045c99e811591c04cd08df585357195c",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f2f9d255_179fef87",
+        "filename": "server/StrictController.cpp",
+        "patchSetId": 5
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2024-07-08T15:02:14Z",
+      "side": 1,
+      "message": "This is too broad.",
+      "revId": "4e1b2120045c99e811591c04cd08df585357195c",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    }
+  ]
+}

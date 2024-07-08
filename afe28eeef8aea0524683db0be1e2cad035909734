@@ -16,6 +16,24 @@
       "message": "I don\u0027t think this is worth it for reasons mentioned in the issue.\n\nApart from that, has this been tested? It doesn\u0027t look like it will work as expected. `CONNMARK` is still being used to mark connections, but a `REJECT` based on connmark was removed - where does it reject now?",
       "revId": "afe28eeef8aea0524683db0be1e2cad035909734",
       "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "78a311e4_40864fac",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000062
+      },
+      "writtenOn": "2024-07-08T14:56:23Z",
+      "side": 1,
+      "message": "Never mind, I think I see it right above?\n\nSo the question would just be \"has this been tested?\", but I would still recommend against it.",
+      "parentUuid": "3fb21804_8e6afbb4",
+      "revId": "afe28eeef8aea0524683db0be1e2cad035909734",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
     }
   ]
 }

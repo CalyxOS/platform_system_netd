@@ -51,6 +51,24 @@
       "message": "I think we should hold this since hotspot/tethering clients do not use host\u0027s private DNS and therefore networking is mostly broken for clients since their DNS (cleartext udp) requests are blocked",
       "revId": "66008d636341ba94173d0e3f6945bb0352056595",
       "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "be1db1fb_707a0d3f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000002
+      },
+      "writtenOn": "2024-07-10T14:06:06Z",
+      "side": 1,
+      "message": "To exempt that we\u0027d have to allow cleartext UDP for the dnsmasq UID. Otherwise there are no simple solutions for forwarding client DNS traffic through the host\u0027s private DNS configuration",
+      "parentUuid": "f8035f5e_ada5eff2",
+      "revId": "66008d636341ba94173d0e3f6945bb0352056595",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
     }
   ]
 }

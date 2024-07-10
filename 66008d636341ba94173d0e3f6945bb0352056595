@@ -69,6 +69,24 @@
       "parentUuid": "f8035f5e_ada5eff2",
       "revId": "66008d636341ba94173d0e3f6945bb0352056595",
       "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7d8ec9e5_fd58c634",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000062
+      },
+      "writtenOn": "2024-07-10T14:14:52Z",
+      "side": 1,
+      "message": "This patch already does that, doesn\u0027t it, for DHCP? That traffic wouldn\u0027t be going out to the internet though.",
+      "parentUuid": "be1db1fb_707a0d3f",
+      "revId": "66008d636341ba94173d0e3f6945bb0352056595",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
     }
   ]
 }

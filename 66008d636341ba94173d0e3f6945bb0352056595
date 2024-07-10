@@ -87,6 +87,24 @@
       "parentUuid": "be1db1fb_707a0d3f",
       "revId": "66008d636341ba94173d0e3f6945bb0352056595",
       "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b316cd8c_20a2e0de",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000002
+      },
+      "writtenOn": "2024-07-10T14:16:40Z",
+      "side": 1,
+      "message": "1073 is the network stack UID which handles initial DHCP. DNS traffic from the client device is not exempted currently",
+      "parentUuid": "7d8ec9e5_fd58c634",
+      "revId": "66008d636341ba94173d0e3f6945bb0352056595",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
     }
   ]
 }

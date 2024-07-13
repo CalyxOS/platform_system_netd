@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c5c58cdb_b482a238",
+        "filename": "server/RouteController.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 679,
+      "author": {
+        "id": 1000062
+      },
+      "writtenOn": "2024-07-13T05:48:29Z",
+      "side": 0,
+      "message": "There is probably a sensible reason why I chose to do this instead of enhancing this method to consider allowed UIDs, but I should double-check, since if we can do that, it would be better and may remove the need for the other bypassable VPN fix we had that I suspect could be failing closed too much.",
+      "revId": "039025e572216575816f5ea56b1c2ea24cda7fc9",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    }
+  ]
+}

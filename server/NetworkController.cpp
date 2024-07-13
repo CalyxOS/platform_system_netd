@@ -37,6 +37,7 @@
 #include "DummyNetwork.h"
 #include "Fwmark.h"
 #include "LocalNetwork.h"
+#include "Network.h"              // UidRangeMap
 #include "PhysicalNetwork.h"
 #include "RouteController.h"
 #include "TcUtils.h"
@@ -75,15 +76,19 @@ class NetworkController::DelegateImpl : public PhysicalNetwork::Delegate {
     virtual ~DelegateImpl();
 
     [[nodiscard]] int modifyFallthrough(unsigned vpnNetId, const std::string& physicalInterface,
-                                        Permission permission, bool add);
+                                        Permission permission, const UidRangeMap& uidRangeMap,
+                                        bool add);
 
   private:
     [[nodiscard]] int addFallthrough(const std::string& physicalInterface,
-                                     Permission permission) override;
+                                     Permission permission,
+                                     const UidRangeMap& uidRangeMap) override;
     [[nodiscard]] int removeFallthrough(const std::string& physicalInterface,
-                                        Permission permission) override;
+                                        Permission permission,
+                                        const UidRangeMap& uidRangeMap) override;
 
     [[nodiscard]] int modifyFallthrough(const std::string& physicalInterface, Permission permission,
+                                        const UidRangeMap& uidRangeMap,
                                         bool add);
 
     NetworkController* const mNetworkController;
@@ -98,11 +103,14 @@ NetworkController::DelegateImpl::~DelegateImpl() {
 
 int NetworkController::DelegateImpl::modifyFallthrough(unsigned vpnNetId,
                                                        const std::string& physicalInterface,
-                                                       Permission permission, bool add) {
+                                                       Permission permission,
+                                                       const UidRangeMap& uidRangeMap,
+                                                       bool add) {
     if (add) {
         if (int ret = RouteController::addVirtualNetworkFallthrough(vpnNetId,
                                                                     physicalInterface.c_str(),
-                                                                    permission)) {
+                                                                    permission,
+                                                                    uidRangeMap)) {
             ALOGE("failed to add fallthrough to %s for VPN netId %u", physicalInterface.c_str(),
                   vpnNetId);
             return ret;
@@ -110,8 +118,10 @@ int NetworkController::DelegateImpl::modifyFallthrough(unsigned vpnNetId,
     } else {
         if (int ret = RouteController::removeVirtualNetworkFallthrough(vpnNetId,
                                                                        physicalInterface.c_str(),
-                                                                       permission)) {
-            ALOGE("failed to remove fallthrough to %s for VPN netId %u", physicalInterface.c_str(),
+                                                                       permission,
+                                                                       uidRangeMap)) {
+            ALOGE("failed to remove fallthrough to %s for VPN netId %u",
+                  physicalInterface.c_str(),
                   vpnNetId);
             return ret;
         }
@@ -120,20 +130,25 @@ int NetworkController::DelegateImpl::modifyFallthrough(unsigned vpnNetId,
 }
 
 int NetworkController::DelegateImpl::addFallthrough(const std::string& physicalInterface,
-                                                    Permission permission) {
-    return modifyFallthrough(physicalInterface, permission, true);
+                                                    Permission permission,
+                                                    const UidRangeMap& uidRangeMap) {
+    return modifyFallthrough(physicalInterface, permission, uidRangeMap, true);
 }
 
 int NetworkController::DelegateImpl::removeFallthrough(const std::string& physicalInterface,
-                                                       Permission permission) {
-    return modifyFallthrough(physicalInterface, permission, false);
+                                                       Permission permission,
+                                                       const UidRangeMap& uidRangeMap) {
+    return modifyFallthrough(physicalInterface, permission, uidRangeMap, false);
 }
 
 int NetworkController::DelegateImpl::modifyFallthrough(const std::string& physicalInterface,
-                                                       Permission permission, bool add) {
+                                                       Permission permission,
+                                                       const UidRangeMap& uidRangeMap,
+                                                       bool add) {
     for (const auto& entry : mNetworkController->mNetworks) {
         if (entry.second->isVirtual()) {
-            if (int ret = modifyFallthrough(entry.first, physicalInterface, permission, add)) {
+            if (int ret = modifyFallthrough(entry.first, physicalInterface, permission,
+                                            uidRangeMap, add)) {
                 return ret;
             }
         }
@@ -1010,9 +1025,10 @@ int NetworkController::modifyFallthroughLocked(unsigned vpnNetId, bool add) {
         return -EINVAL;
     }
     Permission permission = static_cast<PhysicalNetwork*>(network)->getPermission();
+    UidRangeMap& uidRangeMap = static_cast<PhysicalNetwork*>(network)->getUidRangeMap();
     for (const auto& physicalInterface : network->getInterfaces()) {
         if (int ret = mDelegateImpl->modifyFallthrough(vpnNetId, physicalInterface, permission,
-                                                       add)) {
+                                                       uidRangeMap, add)) {
             return ret;
         }
     }

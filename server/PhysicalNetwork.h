@@ -28,9 +28,11 @@ class PhysicalNetwork : public Network {
         virtual ~Delegate();
 
         [[nodiscard]] virtual int addFallthrough(const std::string& physicalInterface,
-                                                 Permission permission) = 0;
+                                                 Permission permission,
+                                                 const UidRangeMap& uidRangeMap) = 0;
         [[nodiscard]] virtual int removeFallthrough(const std::string& physicalInterface,
-                                                    Permission permission) = 0;
+                                                    Permission permission,
+                                                    const UidRangeMap& uidRangeMap) = 0;
     };
 
     PhysicalNetwork(unsigned netId, Delegate* delegate, bool local);

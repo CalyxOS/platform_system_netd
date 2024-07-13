@@ -869,7 +869,8 @@ int RouteController::configureDummyNetwork() {
 /* static */
 int RouteController::modifyPhysicalNetwork(unsigned netId, const char* interface,
                                            const UidRangeMap& uidRangeMap, Permission permission,
-                                           bool add, bool modifyNonUidBasedRules, bool local) {
+                                           bool add, bool modifyNonUidBasedRules, bool local,
+                                           bool isDefault) {
     uint32_t table = getRouteTableForInterface(interface, false /* local */);
     if (table == RT_TABLE_UNSPEC) {
         return -ESRCH;
@@ -900,6 +901,19 @@ int RouteController::modifyPhysicalNetwork(unsigned netId, const char* interface
                     return ret;
                 }
             }
+        }
+    }
+
+    // Modify VPN fallthrough rules if applicable.
+    if (isDefault) {
+// && int ret = modifyVpnFallthroughRule(/* todo */)) {
+        for (const auto& entry : mNetworkController->mNetworks) {
+            if (entry.second->isVirtual()) {
+                if (int ret = modifyFallthrough(entry.first, physicalInterface, permission,
+                                                uidRangeMap, add)) {
+                    return ret;
+                }
+           }
         }
     }
 
@@ -1299,9 +1313,10 @@ int RouteController::removeInterfaceFromLocalNetwork(unsigned netId, const char*
 
 int RouteController::addInterfaceToPhysicalNetwork(unsigned netId, const char* interface,
                                                    Permission permission,
-                                                   const UidRangeMap& uidRangeMap, bool local) {
+                                                   const UidRangeMap& uidRangeMap, bool local,
+                                                   bool isDefault) {
     if (int ret = modifyPhysicalNetwork(netId, interface, uidRangeMap, permission, ACTION_ADD,
-                                        MODIFY_NON_UID_BASED_RULES, local)) {
+                                        MODIFY_NON_UID_BASED_RULES, local, isDefault)) {
         return ret;
     }
 
@@ -1318,9 +1333,9 @@ int RouteController::addInterfaceToPhysicalNetwork(unsigned netId, const char* i
 int RouteController::removeInterfaceFromPhysicalNetwork(unsigned netId, const char* interface,
                                                         Permission permission,
                                                         const UidRangeMap& uidRangeMap,
-                                                        bool local) {
+                                                        bool local, bool isDefault) {
     if (int ret = modifyPhysicalNetwork(netId, interface, uidRangeMap, permission, ACTION_DEL,
-                                        MODIFY_NON_UID_BASED_RULES, local)) {
+                                        MODIFY_NON_UID_BASED_RULES, local, isDefault)) {
         return ret;
     }
 
@@ -1364,17 +1379,18 @@ int RouteController::removeInterfaceFromVirtualNetwork(unsigned netId, const cha
 
 int RouteController::modifyPhysicalNetworkPermission(unsigned netId, const char* interface,
                                                      Permission oldPermission,
-                                                     Permission newPermission, bool local) {
+                                                     Permission newPermission, bool local,
+                                                     bool isDefault) {
     // Physical network rules either use permission bits or UIDs, but not both.
     // So permission changes don't affect any UID-based rules.
     UidRangeMap emptyUidRangeMap;
     // Add the new rules before deleting the old ones, to avoid race conditions.
     if (int ret = modifyPhysicalNetwork(netId, interface, emptyUidRangeMap, newPermission,
-                                        ACTION_ADD, MODIFY_NON_UID_BASED_RULES, local)) {
+                                        ACTION_ADD, MODIFY_NON_UID_BASED_RULES, local, isDefault)) {
         return ret;
     }
     return modifyPhysicalNetwork(netId, interface, emptyUidRangeMap, oldPermission, ACTION_DEL,
-                                 MODIFY_NON_UID_BASED_RULES, local);
+                                 MODIFY_NON_UID_BASED_RULES, local, isDefault);
 }
 
 int RouteController::addUsersToRejectNonSecureNetworkRule(const UidRanges& uidRanges) {
@@ -1479,8 +1495,10 @@ int RouteController::disableTethering(const char* inputInterface, const char* ou
 }
 
 int RouteController::addVirtualNetworkFallthrough(unsigned vpnNetId, const char* physicalInterface,
-                                                  Permission permission) {
-    if (int ret = modifyVpnFallthroughRule(RTM_NEWRULE, vpnNetId, physicalInterface, permission)) {
+                                                  Permission permission,
+                                                  const UidRangeMap& uidRangeMap) {
+    if (int ret = modifyVpnFallthroughRule(RTM_NEWRULE, vpnNetId, physicalInterface, permission,
+            uidRangeMap)) {
         return ret;
     }
 
@@ -1489,8 +1507,10 @@ int RouteController::addVirtualNetworkFallthrough(unsigned vpnNetId, const char*
 
 int RouteController::removeVirtualNetworkFallthrough(unsigned vpnNetId,
                                                      const char* physicalInterface,
-                                                     Permission permission) {
-    if (int ret = modifyVpnFallthroughRule(RTM_DELRULE, vpnNetId, physicalInterface, permission)) {
+                                                     Permission permission,
+                                                     const UidRangeMap& uidRangeMap) {
+    if (int ret = modifyVpnFallthroughRule(RTM_DELRULE, vpnNetId, physicalInterface, permission,
+            uidRangeMap)) {
         return ret;
     }
 
@@ -1498,15 +1518,17 @@ int RouteController::removeVirtualNetworkFallthrough(unsigned vpnNetId,
 }
 
 int RouteController::addUsersToPhysicalNetwork(unsigned netId, const char* interface,
-                                               const UidRangeMap& uidRangeMap, bool local) {
+                                               const UidRangeMap& uidRangeMap, bool local,
+                                               bool isDefault) {
     return modifyPhysicalNetwork(netId, interface, uidRangeMap, PERMISSION_NONE, ACTION_ADD,
-                                 !MODIFY_NON_UID_BASED_RULES, local);
+                                 !MODIFY_NON_UID_BASED_RULES, local, isDefault);
 }
 
 int RouteController::removeUsersFromPhysicalNetwork(unsigned netId, const char* interface,
-                                                    const UidRangeMap& uidRangeMap, bool local) {
+                                                    const UidRangeMap& uidRangeMap, bool local,
+                                                    bool isDefault) {
     return modifyPhysicalNetwork(netId, interface, uidRangeMap, PERMISSION_NONE, ACTION_DEL,
-                                 !MODIFY_NON_UID_BASED_RULES, local);
+                                 !MODIFY_NON_UID_BASED_RULES, local, isDefault);
 }
 
 int RouteController::addUsersToUnreachableNetwork(unsigned netId, const UidRangeMap& uidRangeMap) {

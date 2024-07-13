@@ -149,6 +149,10 @@ bool Network::isSecure() const {
     return mSecure;
 }
 
+UidRangeMap& Network::getUidRangeMap() const {
+    return mUidRangeMap;
+}
+
 Network::Network(unsigned netId, bool secure) : mNetId(netId), mSecure(secure) {}
 
 }  // namespace net

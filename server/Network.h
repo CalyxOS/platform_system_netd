@@ -68,6 +68,7 @@ public:
     void clearAllowedUids();
     void setAllowedUids(const UidRanges& uidRanges);
     bool isUidAllowed(uid_t uid);
+    const UidRangeMap& getUidRangeMap() const;
 
   protected:
     explicit Network(unsigned netId, bool secure = false);

@@ -122,12 +122,12 @@ public:
     [[nodiscard]] static int addInterfaceToPhysicalNetwork(unsigned netId, const char* interface,
                                                            Permission permission,
                                                            const UidRangeMap& uidRangeMap,
-                                                           bool local);
+                                                           bool local, bool isDefault);
     [[nodiscard]] static int removeInterfaceFromPhysicalNetwork(unsigned netId,
                                                                 const char* interface,
                                                                 Permission permission,
                                                                 const UidRangeMap& uidRangeMap,
-                                                                bool local);
+                                                                bool local, bool isDefault);
 
     [[nodiscard]] static int addInterfaceToVirtualNetwork(unsigned netId, const char* interface,
                                                           bool secure,
@@ -140,7 +140,8 @@ public:
 
     [[nodiscard]] static int modifyPhysicalNetworkPermission(unsigned netId, const char* interface,
                                                              Permission oldPermission,
-                                                             Permission newPermission, bool local);
+                                                             Permission newPermission, bool local,
+                                                             bool isDefault);
 
     [[nodiscard]] static int addUsersToVirtualNetwork(unsigned netId, const char* interface,
                                                       bool secure, const UidRangeMap& uidRangeMap,
@@ -175,17 +176,20 @@ public:
 
     [[nodiscard]] static int addVirtualNetworkFallthrough(unsigned vpnNetId,
                                                           const char* physicalInterface,
-                                                          Permission permission);
+                                                          Permission permission,
+                                                          const UidRangeMap& uidRangeMap);
     [[nodiscard]] static int removeVirtualNetworkFallthrough(unsigned vpnNetId,
                                                              const char* physicalInterface,
-                                                             Permission permission);
+                                                             Permission permission,
+                                                             const UidRangeMap& uidRangeMap);
 
     [[nodiscard]] static int addUsersToPhysicalNetwork(unsigned netId, const char* interface,
-                                                       const UidRangeMap& uidRangeMap, bool local);
+                                                       const UidRangeMap& uidRangeMap, bool local,
+                                                       bool isDefault);
 
     [[nodiscard]] static int removeUsersFromPhysicalNetwork(unsigned netId, const char* interface,
                                                             const UidRangeMap& uidRangeMap,
-                                                            bool local);
+                                                            bool local, bool isDefault);
 
     [[nodiscard]] static int addUsersToUnreachableNetwork(unsigned netId,
                                                           const UidRangeMap& uidRangeMap);
@@ -224,7 +228,8 @@ public:
     static int modifyDefaultNetwork(uint16_t action, const char* interface, Permission permission);
     static int modifyPhysicalNetwork(unsigned netId, const char* interface,
                                      const UidRangeMap& uidRangeMap, Permission permission,
-                                     bool add, bool modifyNonUidBasedRules, bool local);
+                                     bool add, bool modifyNonUidBasedRules, bool local,
+                                     bool isDefault);
     static int modifyUnreachableNetwork(unsigned netId, const UidRangeMap& uidRangeMap, bool add);
     static int modifyRoute(uint16_t action, uint16_t flags, const char* interface,
                            const char* destination, const char* nexthop, TableType tableType,
@@ -232,7 +237,8 @@ public:
     static int modifyTetheredNetwork(uint16_t action, const char* inputInterface,
                                      const char* outputInterface);
     static int modifyVpnFallthroughRule(uint16_t action, unsigned vpnNetId,
-                                        const char* physicalInterface, Permission permission);
+                                        const char* physicalInterface, Permission permission,
+                                        const UidRangeMap& uidRangeMap);
     static int modifyVirtualNetwork(unsigned netId, const char* interface,
                                     const UidRangeMap& uidRangeMap, bool secure, bool add,
                                     bool modifyNonUidBasedRules, bool excludeLocalRoutes);

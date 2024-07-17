@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f367c45d_a093bb3b",
+        "filename": "server/NetworkController.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 226,
+      "author": {
+        "id": 1000062
+      },
+      "writtenOn": "2024-07-17T18:21:35Z",
+      "side": 1,
+      "message": "It may seem strange to set this here, since the comment says \"there is no VPN that applies to the user\", but that could change any time, and if it does, we don\u0027t want there to be a race or a leak. We want the traffic to get blocked if the UID does not have permission to be protected from it.",
+      "revId": "49292fcf53eb48f04161827dd20ada89cb00d3c6",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6595e510_f884c0fa",
+        "filename": "server/NetworkController.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 258,
+      "author": {
+        "id": 1000062
+      },
+      "writtenOn": "2024-07-17T18:21:35Z",
+      "side": 1,
+      "message": "This replicates logic seen elsewhere. It\u0027s a heuristic: it is assumed that if the network is explicitly selected, and if the uid *can* protect connections from the VPN, it wants to protect this DNS traffic from the VPN as well.\n\nUsually, an app would protect a given socket from the VPN, but for DNS queries that reach this point, the app hasn\u0027t been working with a socket, and there is no way to indicate a preference. It just has to be assumed.",
+      "revId": "49292fcf53eb48f04161827dd20ada89cb00d3c6",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    }
+  ]
+}

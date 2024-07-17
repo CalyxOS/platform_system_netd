@@ -3,6 +3,23 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "acb73db6_275f4d8d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000062
+      },
+      "writtenOn": "2024-07-17T20:15:45Z",
+      "side": 1,
+      "message": "Tested broken before, and working after, using the steps [here](https://gitlab.com/CalyxOS/calyxos/-/issues/2555#note_2004224306) and replicated below:\n\n### Steps to reproduce (root required)\n1. Connect to Wi-Fi.\n2. Install Wireguard from Aurora Store.\n3. Visit https://mullvad.net/en/blog/dns-traffic-can-leak-outside-the-vpn-tunnel-on-android\n4. Download the linked wg1.conf and wg2.conf\n5. Open the [spam_get_requests.html](https://mullvad.net/media/uploads/2024/05/03/spam_get_requests.html) page, but do not tap Start yet.\n6. Import the downloaded config files into Wireguard.\n7. Turn on one of the connections, accepting the VPN creation.\n8. Set Wireguard as the always-on, \"block connections without VPN\" (lockdown) VPN.\n9. Split window between Wireguard and the browser.\n10. Connect the device to a computer with USB debugging.\n11. Run `adb root`.\n12. Open `adb shell` in two separate terminals.\n13. In one terminal, run all of the following:\n```\niptables -I OUTPUT -p udp --dport 53 -j NFLOG --nflog-group 42\niptables -I OUTPUT -p tcp --dport 53 -j NFLOG --nflog-group 42\nip6tables -I OUTPUT -p udp --dport 53 -j NFLOG --nflog-group 42\nip6tables -I OUTPUT -p tcp --dport 53 -j NFLOG --nflog-group 42\ntcpdump -n -i nflog:42 -w /data/local/tmp/repro.pcap\n```\n14. In the other terminal, run: `tcpdump -n -i wlan0 \u0027port 53\u0027 -vvv`.\n15. Rapidly switch between wg1 and wg2 for 30 seconds, watching for any activity in the second terminal.\n16. Rapidly toggle wg1 or wg2 off and on for 30 seconds, watching for any activity in the second terminal.\n\n### Expected result\nNo activity in the second terminal. The /data/local/tmp/repro.pcap file contains only attempts to send DNS requests over the VPN, which can be identified by source address 192.0.2.2.\n\n### Actual result\nActivity in the second terminal. The /data/local/tmp/repro.pcap file includes some packets that use the source IP and output interface of wlan0.",
+      "revId": "49292fcf53eb48f04161827dd20ada89cb00d3c6",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "f367c45d_a093bb3b",
         "filename": "server/NetworkController.cpp",
         "patchSetId": 1

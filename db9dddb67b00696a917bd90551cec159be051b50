@@ -22,6 +22,30 @@
       },
       "revId": "db9dddb67b00696a917bd90551cec159be051b50",
       "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "632b8892_94f6f13c",
+        "filename": "server/StrictController.cpp",
+        "patchSetId": 6
+      },
+      "lineNbr": 135,
+      "author": {
+        "id": 1000002
+      },
+      "writtenOn": "2024-07-18T18:15:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0a613a6a_cb7a3d39",
+      "range": {
+        "startLine": 132,
+        "startChar": 0,
+        "endLine": 135,
+        "endChar": 1
+      },
+      "revId": "db9dddb67b00696a917bd90551cec159be051b50",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
     }
   ]
 }

@@ -51,6 +51,24 @@
       "message": "System still tries to resolve time.android.com using cleartext dns which fails",
       "revId": "eb2a0a757f2205d756b76ab3c9d7965ecc9dd7d5",
       "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e2a76f79_4f0cab01",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000002
+      },
+      "writtenOn": "2024-07-18T18:15:38Z",
+      "side": 1,
+      "message": "Unsure if it causes problems, if there\u0027s a fallback nor what causes this at the moment",
+      "parentUuid": "1fc7d235_f2e67977",
+      "revId": "eb2a0a757f2205d756b76ab3c9d7965ecc9dd7d5",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
     }
   ]
 }

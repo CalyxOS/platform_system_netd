@@ -51,6 +51,24 @@
       "parentUuid": "f2f9d255_179fef87",
       "revId": "4e1b2120045c99e811591c04cd08df585357195c",
       "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0f3d1cfd_b39af642",
+        "filename": "server/StrictController.cpp",
+        "patchSetId": 5
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2024-07-18T16:39:15Z",
+      "side": 1,
+      "message": "If we can\u0027t, https://review.calyxos.org/c/CalyxOS/platform_packages_apps_Settings/+/17330 will have to be abandoned too.",
+      "parentUuid": "cb80dc4b_8b6afe61",
+      "revId": "4e1b2120045c99e811591c04cd08df585357195c",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
     }
   ]
 }

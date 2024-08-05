@@ -241,17 +241,17 @@ uint32_t NetworkController::getNetworkForDnsLocked(unsigned* netId, uid_t uid) c
             *netId = defaultNetId;
         }
     } else {
-        // If the user is subject to a VPN and the VPN provides DNS servers, use those servers
-        // (possibly falling through to the default network if the VPN doesn't provide a route to
-        // them). Otherwise, use the default network's DNS servers.
-        // TODO: Consider if we should set the explicit bit here.
+        // If the user is subject to a VPN and the VPN provides DNS servers, use those servers.
+        // Otherwise, because access was not granted to the given network, just fail.
         VirtualNetwork* virtualNetwork = getVirtualNetworkForUserLocked(uid);
         if (virtualNetwork && resolv_has_nameservers(virtualNetwork->getNetId())) {
             *netId = virtualNetwork->getNetId();
         } else {
-            // TODO: return an error instead of silently doing the DNS lookup on the wrong network.
+            // TODO: return an error instead of silently doing the DNS lookup on the unreachable
+            // network.
             // http://b/27560555
-            *netId = defaultNetId;
+            fwmark.explicitlySelected = true;
+            *netId = UNREACHABLE_NET_ID;
         }
     }
     fwmark.netId = *netId;

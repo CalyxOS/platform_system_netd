@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "170a49f0_3d67e8cb",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000062
+      },
+      "writtenOn": "2024-08-06T00:36:51Z",
+      "side": 1,
+      "message": "I must have lost track in testing, because I cannot again repro a scenario in which this is needed. The termux case isn\u0027t exhibiting the issue. I may have had lockdown off briefly and forgot.",
+      "revId": "8140dfb678174eb2224d877015bd465ce9dc68fd",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    }
+  ]
+}

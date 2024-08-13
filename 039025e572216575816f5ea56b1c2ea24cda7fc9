@@ -16,6 +16,24 @@
       "message": "There is probably a sensible reason why I chose to do this instead of enhancing this method to consider allowed UIDs, but I should double-check, since if we can do that, it would be better and may remove the need for the other bypassable VPN fix we had that I suspect could be failing closed too much.",
       "revId": "039025e572216575816f5ea56b1c2ea24cda7fc9",
       "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "06507f1c_93c8507f",
+        "filename": "server/RouteController.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 679,
+      "author": {
+        "id": 1000062
+      },
+      "writtenOn": "2024-08-13T14:06:28Z",
+      "side": 0,
+      "message": "Short answer: because it is encapsulated in such a way that we do not have the info we need and need to make changes to several functions to pass it around, and even then we need to enumerate all virtual networks on the system to apply the changes to each of them, and [...]\n\n(This was an incomplete draft, but I think it speaks for itself as-is, frankly.)",
+      "parentUuid": "c5c58cdb_b482a238",
+      "revId": "039025e572216575816f5ea56b1c2ea24cda7fc9",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
     }
   ]
 }

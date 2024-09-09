@@ -1028,7 +1028,8 @@ int RouteController::modifyUnreachableNetwork(unsigned netId, const UidRangeMap&
     return 0;
 }
 
-[[nodiscard]] static int modifyRejectNonSecureNetworkRule(const UidRanges& uidRanges, bool add) {
+int RouteController::modifyRejectNonSecureNetworkRule(const UidRanges& uidRanges, bool add) {
+    std::lock_guard lock(sSecureUidRangesLock);
     Fwmark fwmark;
     Fwmark mask;
     fwmark.protectedFromVpn = false;
@@ -1039,6 +1040,11 @@ int RouteController::modifyUnreachableNetwork(unsigned netId, const UidRangeMap&
                                    FR_ACT_PROHIBIT, RT_TABLE_UNSPEC, fwmark.intValue, mask.intValue,
                                    IIF_LOOPBACK, OIF_NONE, range.start, range.stop)) {
             return ret;
+        }
+        if (add) {
+            sSecureUidRanges.add(range);
+        } else {
+            sSecureUidRanges.remove(range);
         }
     }
 
@@ -1518,8 +1524,16 @@ int RouteController::removeUsersFromUnreachableNetwork(unsigned netId,
     return modifyUnreachableNetwork(netId, uidRangeMap, ACTION_DEL);
 }
 
+bool RouteController::isSecureUid(uid_t uid) {
+    std::lock_guard lock(sSecureUidRangesLock);
+    return sSecureUidRanges.hasUid(uid);
+}
+
 // Protects sInterfaceToTable.
 std::mutex RouteController::sInterfaceToTableLock;
 std::map<std::string, uint32_t> RouteController::sInterfaceToTable;
+// Protects sSecureUidRanges.
+std::mutex RouteController::sSecureUidRangesLock;
+UidRanges RouteController::sSecureUidRanges;
 
 }  // namespace android::net

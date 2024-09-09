@@ -1526,7 +1526,9 @@ int RouteController::removeUsersFromUnreachableNetwork(unsigned netId,
 
 bool RouteController::isSecureUid(uid_t uid) {
     std::lock_guard lock(sSecureUidRangesLock);
-    return sSecureUidRanges.hasUid(uid);
+    bool hasUid = sSecureUidRanges.hasUid(uid);
+    ALOGI("isSecureUid: %d: %d", uid, hasUid);
+    return hasUid;
 }
 
 // Protects sInterfaceToTable.

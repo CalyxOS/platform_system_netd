@@ -135,6 +135,18 @@ void UidRanges::remove(const UidRanges& other) {
     mRanges.erase(end, mRanges.end());
 }
 
+void UidRanges::add(const UidRangeParcel& range) {
+    auto middle = std::upper_bound(mRanges.begin(), mRanges.end(), range, compUidRangeParcel);
+    mRanges.insert(middle, range);
+}
+
+void UidRanges::remove(const UidRangeParcel& range) {
+    auto it = std::find(mRanges.begin(), mRanges.end(), range);
+    if (it != mRanges.end()) {
+        mRanges.erase(it);
+    }
+}
+
 bool UidRanges::overlapsSelf() const {
     // Compare each element one by one
     for (size_t i = 0; i < mRanges.size(); i++) {

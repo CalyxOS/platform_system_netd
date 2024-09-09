@@ -193,6 +193,8 @@ public:
     [[nodiscard]] static int removeUsersFromUnreachableNetwork(unsigned netId,
                                                                const UidRangeMap& uidRangeMap);
 
+    [[nodiscard]] static bool isSecureUid(uid_t uid) EXCLUDES(sSecureUidRangesLock);
+
     // For testing.
     static int (*iptablesRestoreCommandFunction)(IptablesTarget, const std::string&,
                                                  const std::string&, std::string *);
@@ -211,6 +213,8 @@ public:
 
     static std::mutex sInterfaceToTableLock;
     static std::map<std::string, uint32_t> sInterfaceToTable GUARDED_BY(sInterfaceToTableLock);
+    static std::mutex sSecureUidRangesLock;
+    static UidRanges sSecureUidRanges GUARDED_BY(sSecureUidRangesLock);
 
     static int configureDummyNetwork();
     [[nodiscard]] static int flushRoutes(const char* interface) EXCLUDES(sInterfaceToTableLock);
@@ -233,6 +237,8 @@ public:
                                      const char* outputInterface);
     static int modifyVpnFallthroughRule(uint16_t action, unsigned vpnNetId,
                                         const char* physicalInterface, Permission permission);
+    [[nodiscard]] static int modifyRejectNonSecureNetworkRule(const UidRanges& uidRanges, bool add)
+            EXCLUDES(sSecureUidRangesLock);
     static int modifyVirtualNetwork(unsigned netId, const char* interface,
                                     const UidRangeMap& uidRangeMap, bool secure, bool add,
                                     bool modifyNonUidBasedRules, bool excludeLocalRoutes);

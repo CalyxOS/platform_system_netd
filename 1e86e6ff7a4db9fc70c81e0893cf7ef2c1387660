@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0a53876f_da946566",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000062
+      },
+      "writtenOn": "2024-09-09T20:12:12Z",
+      "side": 1,
+      "message": "Passing steps to reproduce for calyxos#2660; solves that.\n\nFailing steps to reproduce for calyxos#2555; the original problem is back.",
+      "revId": "1e86e6ff7a4db9fc70c81e0893cf7ef2c1387660",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    }
+  ]
+}

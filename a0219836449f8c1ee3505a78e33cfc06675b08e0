@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b379f9f2_3964fd1b",
+        "filename": "server/UidRanges.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 145,
+      "author": {
+        "id": 1000062
+      },
+      "writtenOn": "2024-09-09T19:03:35Z",
+      "side": 1,
+      "message": "Forgot to post this comment, but it is now resolved.\n\nIn PS2 and below, the new remove method overload for UidRangeParcel removed *every* instance of the range, in the event there were multiple. `UidRanges::remove(const UidRanges\u0026 other)` does not remove *every* instance of the supplied ranges. This is basically a convenience method, preventing the need to construct a new UidRanges. It should function the same, though. Now, it does.\n\nAlso, because I\u0027m not incredibly familiar with C++ compared to Java, I researched and then tested the vector manipulation behavior with some messy test code executed on my PC - not included here, but can share if wanted.",
+      "revId": "a0219836449f8c1ee3505a78e33cfc06675b08e0",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    }
+  ]
+}

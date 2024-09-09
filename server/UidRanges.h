@@ -48,6 +48,8 @@ public:
 
     void add(const UidRanges& other);
     void remove(const UidRanges& other);
+    void add(const UidRangeParcel& range);
+    void remove(const UidRangeParcel& range);
 
     // check if 'mRanges' has uid overlap between elements.
     bool overlapsSelf() const;

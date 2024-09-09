@@ -34,6 +34,24 @@
       "parentUuid": "0a53876f_da946566",
       "revId": "1e86e6ff7a4db9fc70c81e0893cf7ef2c1387660",
       "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dc0bd7e0_faceb81e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000062
+      },
+      "writtenOn": "2024-09-09T21:54:45Z",
+      "side": 1,
+      "message": "It looks like what I was actually seeing was an attempt to talk to the VPN\u0027s configured DNS over Wi-Fi on port 853 (DoT). This is odd and shouldn\u0027t happen - the VPN\u0027s DNS should only be communicated with over the VPN itself - but it\u0027s not the same as leaking DNS queries that originate from the user\u0027s own apps / browser.\n\nIt turns out that these are queries - \"probes\" - with a random prefix followed by the value of `PRIVATE_DNS_PROBE_HOST_SUFFIX` (`\"-dnsotls-ds.metric.gstatic.com\"`) - see [DnsUtils.java](https://cs.android.com/android/platform/superproject/+/android-14.0.0_r61:packages/modules/NetworkStack/src/com/android/networkstack/util/DnsUtils.java;l\u003d53).\n\nWould be nice to somehow ensure that these problems always go out the intended interface. That could probably be handled separately. Will revisit soon and possibly resolve this comment.",
+      "parentUuid": "4161b98a_6f9cfa64",
+      "revId": "1e86e6ff7a4db9fc70c81e0893cf7ef2c1387660",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
     }
   ]
 }

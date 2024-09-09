@@ -213,6 +213,7 @@ uint32_t NetworkController::getNetworkForDnsLocked(unsigned* netId, uid_t uid) c
 
     Network* appDefaultNetwork = getPhysicalOrUnreachableNetworkForUserLocked(uid);
     unsigned defaultNetId = appDefaultNetwork ? appDefaultNetwork->getNetId() : mDefaultNetId;
+    bool secureUid = RouteController::isSecureUid(uid);
 
     // Common case: there is no VPN that applies to the user, and the query did not specify a netId.
     // Therefore, it is safe to set the explicit bit on this query and skip all the complex logic
@@ -223,7 +224,7 @@ uint32_t NetworkController::getNetworkForDnsLocked(unsigned* netId, uid_t uid) c
         *netId = defaultNetId;
         fwmark.netId = *netId;
         fwmark.explicitlySelected = true;
-        fwmark.protectedFromVpn = canProtectLocked(uid);
+        fwmark.protectedFromVpn = !secureUid || canProtectLocked(uid);
         return fwmark.intValue;
     }
 
@@ -255,7 +256,7 @@ uint32_t NetworkController::getNetworkForDnsLocked(unsigned* netId, uid_t uid) c
         }
     }
     fwmark.netId = *netId;
-    fwmark.protectedFromVpn = fwmark.explicitlySelected && canProtectLocked(uid);
+    fwmark.protectedFromVpn = !secureUid || (fwmark.explicitlySelected && canProtectLocked(uid));
     return fwmark.intValue;
 }
 

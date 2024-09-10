@@ -29,7 +29,8 @@ union Fwmark {
         bool protectedFromVpn   :  1;
         Permission permission   :  2;
         bool uidBillingDone     :  1;
-        unsigned reserved       :  8;
+        bool enforceNetId       :  1;
+        unsigned reserved       :  7;
         unsigned vendor         :  2;  // reserved for vendor
         bool ingress_cpu_wakeup :  1;  // reserved for config_networkWakeupPacketMark/Mask
     };

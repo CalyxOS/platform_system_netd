@@ -558,6 +558,9 @@ int modifyIncomingPacketMark(unsigned netId, const char* interface, Permission p
     fwmark.permission = PERMISSION_SYSTEM;
     mask.permission = PERMISSION_SYSTEM;
 
+    fwmark.enforceNetId = false;
+    mask.enforceNetId = true;
+
     uint32_t priority;
 
     if (secure) {
@@ -804,6 +807,24 @@ int RouteController::configureDummyNetwork() {
 [[nodiscard]] static int addUnreachableRule() {
     return modifyIpRule(RTM_NEWRULE, RULE_PRIORITY_UNREACHABLE, FR_ACT_UNREACHABLE, RT_TABLE_UNSPEC,
                         MARK_UNSET, MARK_UNSET, IIF_NONE, OIF_NONE, INVALID_UID, INVALID_UID);
+}
+
+// Add an unreachable rule at the end of the explicit rules for the case that the enforceNetId
+// flag is set. This allows DnsResolver to ensure its validation traffic for a given network
+// does not fall through to other interfaces.
+// IMPORTANT: explicitlySelected SHOULD ALSO be true whenever enforceNetId is true, or else the
+// traffic will likely reach this rule and go nowhere! Implicit netIds are not handled!
+[[nodiscard]] static int addEnforcedNetworkRule() {
+    Fwmark fwmark;
+    Fwmark mask;
+
+    fwmark.enforceNetId = true;
+    mask.enforceNetId = true;
+
+    auto priority = RULE_PRIORITY_EXPLICIT_NETWORK + UidRanges::SUB_PRIORITY_LOWEST;
+
+    return modifyIpRule(RTM_NEWRULE, priority, FR_ACT_UNREACHABLE, RT_TABLE_UNSPEC, fwmark.intValue,
+                        mask.intValue, IIF_NONE, OIF_NONE, INVALID_UID, INVALID_UID);
 }
 
 [[nodiscard]] static int modifyLocalNetwork(unsigned netId, const char* interface, bool add) {
@@ -1276,6 +1297,9 @@ int RouteController::Init(unsigned localNetId) {
         return ret;
     }
     if (int ret = addUnreachableRule()) {
+        return ret;
+    }
+    if (int ret = addEnforcedNetworkRule()) {
         return ret;
     }
     // Don't complain if we can't add the dummy network, since not all devices support it.

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a9eaee88_6233e8bb",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000062
+      },
+      "writtenOn": "2024-09-10T16:12:11Z",
+      "side": 1,
+      "message": "Works, based on steps to reproduce in the commit message\u0027s issues. It\u0027s hard to test calyxos#2555 unless you have a local DNS-over-TLS server of your own so that you can ensure the traffic is truly just DNS probes (calyxos#2680) instead of actual lookups.",
+      "revId": "30fe8a4491410f3b8870f44610243d914f03f69c",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    }
+  ]
+}

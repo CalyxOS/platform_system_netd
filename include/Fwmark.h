@@ -29,7 +29,10 @@ union Fwmark {
         bool protectedFromVpn   :  1;
         Permission permission   :  2;
         bool uidBillingDone     :  1;
-        unsigned reserved       :  8;
+        // enforceNetId currently sits at 0x200000 of Fwmark.
+        // sync with DnsResolver/ResolverController.cpp FWMARK_ENFORCE_NETID!
+        bool enforceNetId       :  1;
+        unsigned reserved       :  7;
         unsigned vendor         :  2;  // reserved for vendor
         bool ingress_cpu_wakeup :  1;  // reserved for config_networkWakeupPacketMark/Mask
     };

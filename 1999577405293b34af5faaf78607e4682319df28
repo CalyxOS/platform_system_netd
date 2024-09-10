@@ -16,6 +16,24 @@
       "message": "Needs a DnsResolver change too. Can\u0027t upload it currently.",
       "revId": "1999577405293b34af5faaf78607e4682319df28",
       "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "07d19900_06852291",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000062
+      },
+      "writtenOn": "2024-09-10T21:37:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "38d47c1e_1c368cb5",
+      "revId": "1999577405293b34af5faaf78607e4682319df28",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
     }
   ]
 }

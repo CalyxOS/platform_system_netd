@@ -16,6 +16,23 @@
       "message": "One reason I needed to add this is that, with fallthrough rules, explicitly selecting the network isn\u0027t enough.",
       "revId": "247b08bfd0c82d7f1d6d90a8bcf29ca4d2f540e8",
       "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "85144247_8a9fb51a",
+        "filename": "server/RouteController.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 561,
+      "author": {
+        "id": 1000062
+      },
+      "writtenOn": "2024-09-10T22:54:10Z",
+      "side": 1,
+      "message": "See the comment for this method. It should explain why we want to only apply this if netId is not enforced. The rule priority comes before what we add in `addEnforcedNetworkRule`. So if we don\u0027t do this, it will subvert what the enforcement.",
+      "revId": "247b08bfd0c82d7f1d6d90a8bcf29ca4d2f540e8",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
     }
   ]
 }

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "41fcef5c_192918b2",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000062
+      },
+      "writtenOn": "2024-09-12T22:32:26Z",
+      "side": 1,
+      "message": "Decision 2024: https://gitlab.com/CalyxOS/calyxos/-/issues/2660#note_2102950292\n\nPersonally I would like if we put this chain in any upcoming beta build to see how it goes, but no rush. calyxos#2555 is a functionality breaker, but it has workarounds. The others are leaks, but they\u0027re not major.",
+      "revId": "e0068992bf0f8d033579d1a6dd8fa9e76b622791",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    }
+  ]
+}

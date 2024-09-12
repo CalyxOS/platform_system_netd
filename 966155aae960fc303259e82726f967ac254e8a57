@@ -34,6 +34,24 @@
       "parentUuid": "6d0f74ff_dcd79f71",
       "revId": "966155aae960fc303259e82726f967ac254e8a57",
       "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b5009968_38d438ed",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000062
+      },
+      "writtenOn": "2024-09-12T15:13:39Z",
+      "side": 1,
+      "message": "\u003e Is fwmark something we can freely modify?\n\nRoughly as free as anything else, with the below caveats...\n\n\u003e I don\u0027t know what the reserved section is for, but I\u0027m assuming it\u0027s for future additions AOSP may have?\n\nYes, I think so. That\u0027s usually what that means.\n\n\u003e If so wouldn\u0027t this cause conflicts with such additions later\n\nYes. It could happen. AOSP could use it all. But in my opinion, that\u0027s not likely to happen any time soon, and we could cross that bridge when we come to it. Who knows - by the time they were to use all reserved bits, they might have solved this bug. I would rather have a fix that works now than go without a fix because it *may* not work in the future.\n\nIf I knew of another way to tackle this issue, I\u0027d do it. But apart from some of the ideas I shared in [this GitLab comment](https://gitlab.com/CalyxOS/calyxos/-/issues/2680#note_2099018717), I don\u0027t know what else to do.\n\nI also don\u0027t want to get held up by AOSP if possible. I think they\u0027d get caught up in too many details, and I don\u0027t think this would be their preferred solution. It\u0027s ultimately not mine, either, but without other ideas, it\u0027s either this or leaving it unfixed. They\u0027d probably prefer the latter, but I\u0027d prefer the former.",
+      "parentUuid": "12817abc_e6666422",
+      "revId": "966155aae960fc303259e82726f967ac254e8a57",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
     }
   ]
 }

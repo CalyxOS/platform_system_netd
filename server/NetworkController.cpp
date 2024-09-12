@@ -209,6 +209,10 @@ int NetworkController::setDefaultNetwork(unsigned netId) {
 
 uint32_t NetworkController::getNetworkForDnsLocked(unsigned* netId, uid_t uid) const {
     Fwmark fwmark;
+    // PERMISSION_SYSTEM is necessary to allow traversal of VPNs for UIDs that are not covered
+    // by that VPN, such as Private DNS provided by DnsResolver (UID 0). This is handled by
+    // netd's modifyVpnSystemPermissionRule. For this to work, the network must be explicitly-
+    // selected, as will always be the case for the aforementioned Private DNS.
     fwmark.permission = PERMISSION_SYSTEM;
 
     Network* appDefaultNetwork = getPhysicalOrUnreachableNetworkForUserLocked(uid);
@@ -242,12 +246,26 @@ uint32_t NetworkController::getNetworkForDnsLocked(unsigned* netId, uid_t uid) c
             *netId = defaultNetId;
         }
     } else {
+        // There are two reasons this block might be reached:
+        // 1. The netId is unset, but a VPN applies to the user. NETID_UNSET fails the access check.
+        // 2. The UID actually has no access to the specified netId.
+
+        // DnsResolver's direct communication with Private DNS servers should never reach this block
+        // because it occurs on UID 0, which should be deemed to have access to any network, and it
+        // always specifies a netId.
+        // Queries from other apps covered by a VPN may not include a netId, so here we are.
+
         // If the user is subject to a VPN and the VPN provides DNS servers, use those servers
         // (possibly falling through to the default network if the VPN doesn't provide a route to
         // them). Otherwise, use the default network's DNS servers.
         // TODO: Consider if we should set the explicit bit here.
         VirtualNetwork* virtualNetwork = getVirtualNetworkForUserLocked(uid);
         if (virtualNetwork && resolv_has_nameservers(virtualNetwork->getNetId())) {
+            // If the UID is secure (lockdown), explicitly select it to prevent queries from trying
+            // to use the DNS server via a different network, particularly during.
+            // Otherwise, queries by DnsResolver can fall through because UID 0 is not included in
+            // RULE_PRIORITY_PROHIBIT_NON_VPN rules.
+            fwmark.explicitlySelected = secureUid;
             *netId = virtualNetwork->getNetId();
         } else {
             // TODO: return an error instead of silently doing the DNS lookup on the wrong network.

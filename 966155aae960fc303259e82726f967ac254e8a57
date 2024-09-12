@@ -16,6 +16,24 @@
       "message": "Is fwmark something we can freely modify? I don\u0027t know what the reserved section is for, but I\u0027m assuming it\u0027s for future additions AOSP may have? If so wouldn\u0027t this cause conflicts with such additions later (in which case we\u0027d have to resolve the conflict at that time)? And if the entire reserved space is used then there\u0027d be no good solution since the entire fwmark would be used by one thing or another (in which case we\u0027d need our own separate solution)?",
       "revId": "966155aae960fc303259e82726f967ac254e8a57",
       "serverId": "35266860-6252-469c-a67d-185064479fc0"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "12817abc_e6666422",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000002
+      },
+      "writtenOn": "2024-09-12T15:00:47Z",
+      "side": 1,
+      "message": "That said, if there\u0027s no mechanism that exists currently that could help with this I\u0027d suggest this be uploaded to AOSP to ideally get some feedback or even integration upstream",
+      "parentUuid": "6d0f74ff_dcd79f71",
+      "revId": "966155aae960fc303259e82726f967ac254e8a57",
+      "serverId": "35266860-6252-469c-a67d-185064479fc0"
     }
   ]
 }

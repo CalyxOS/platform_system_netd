@@ -232,7 +232,7 @@ int TetherController::startTethering(bool usingLegacyDnsProxy, int num_addrs, ch
     char markStr[UINT32_HEX_STRLEN];
     snprintf(markStr, sizeof(markStr), "0x%x", fwmark.intValue);
 
-    std::vector<const std::string> argVector = {
+    std::vector<std::string> argVector = {
             "/system/bin/dnsmasq",
             "--keep-in-foreground",
             "--no-resolv",
@@ -291,7 +291,7 @@ int TetherController::startTethering(bool usingLegacyDnsProxy, int num_addrs, ch
         return -res;
     }
     const android::base::ScopeGuard attrGuard = [&] { posix_spawnattr_destroy(&attr); };
-    res = posix_spawnattr_setflags(&attr, POSIX_SPAWN_USEVFORK);
+    res = posix_spawnattr_setflags(&attr, POSIX_SPAWN_USEVFORK | POSIX_SPAWN_CLOEXEC_DEFAULT);
     if (res) {
         ALOGE("posix_spawnattr_setflags failed (%s)", strerror(res));
         return -res;

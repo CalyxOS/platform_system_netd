@@ -122,19 +122,16 @@ bool initDnsResolver() {
 
 int main() {
     Stopwatch s;
-    gLog.info("netd 1.0 starting");
+    gLog.info("netd starting");
 
     android::net::process::removePidFile(PID_FILE_PATH);
-    gLog.info("Pid file removed");
     android::net::process::blockSigPipe();
-    gLog.info("SIGPIPE is blocked");
 
     // Before we do anything that could fork, mark CLOEXEC the UNIX sockets that we get from init.
     // FrameworkListener does this on initialization as well, but we only initialize these
     // components after having initialized other subsystems that can fork.
     for (const auto& sock : {DNSPROXYLISTENER_SOCKET_NAME, FwmarkServer::SOCKET_NAME}) {
         setCloseOnExec(sock);
-        gLog.info("setCloseOnExec(%s)", sock);
     }
 
     std::string cg2_path;

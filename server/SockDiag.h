@@ -73,9 +73,6 @@ class SockDiag {
     int destroySockets(const char* addrstr, int ifindex);
     // Destroys all sockets for the given protocol and UID.
     int destroySockets(uint8_t proto, uid_t uid, bool excludeLoopback);
-    // Destroys all "live" (CONNECTED, SYN_SENT, SYN_RECV) TCP sockets for the given UID ranges.
-    int destroySockets(const UidRanges& uidRanges, const std::set<uid_t>& skipUids,
-                       bool excludeLoopback);
     // Destroys all "live" (CONNECTED, SYN_SENT, SYN_RECV) TCP sockets that no longer have
     // the permissions required by the specified network.
     int destroySocketsLackingPermission(unsigned netId, Permission permission,

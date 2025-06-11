@@ -995,49 +995,6 @@ void checkSocketpairClosed(int clientSocket, int acceptedSocket) {
     EXPECT_EQ(ECONNRESET, err);
 }
 
-TEST_F(NetdBinderTest, SocketDestroy) {
-    unique_fd clientSocket, serverSocket, acceptedSocket;
-    ASSERT_NO_FATAL_FAILURE(fakeRemoteSocketPair(&clientSocket, &serverSocket, &acceptedSocket));
-
-    // Pick a random UID in the system UID range.
-    constexpr int baseUid = AID_APP - 2000;
-    static_assert(baseUid > 0, "Not enough UIDs? Please fix this test.");
-    int uid = baseUid + 500 + arc4random_uniform(1000);
-    EXPECT_EQ(0, fchown(clientSocket, uid, -1));
-
-    // UID ranges that don't contain uid.
-    std::vector<UidRangeParcel> uidRanges = {
-            makeUidRangeParcel(baseUid + 42, baseUid + 449),
-            makeUidRangeParcel(baseUid + 1536, AID_APP - 4),
-            makeUidRangeParcel(baseUid + 498, uid - 1),
-            makeUidRangeParcel(uid + 1, baseUid + 1520),
-    };
-    // A skip list that doesn't contain UID.
-    std::vector<int32_t> skipUids { baseUid + 123, baseUid + 1600 };
-
-    // Close sockets. Our test socket should be intact.
-    EXPECT_TRUE(mNetd->socketDestroy(uidRanges, skipUids).isOk());
-    checkSocketpairOpen(clientSocket, acceptedSocket);
-
-    // UID ranges that do contain uid.
-    uidRanges = {
-            makeUidRangeParcel(baseUid + 42, baseUid + 449),
-            makeUidRangeParcel(baseUid + 1536, AID_APP - 4),
-            makeUidRangeParcel(baseUid + 498, baseUid + 1520),
-    };
-    // Add uid to the skip list.
-    skipUids.push_back(uid);
-
-    // Close sockets. Our test socket should still be intact because it's in the skip list.
-    EXPECT_TRUE(mNetd->socketDestroy(uidRanges, skipUids).isOk());
-    checkSocketpairOpen(clientSocket, acceptedSocket);
-
-    // Now remove uid from skipUids, and close sockets. Our test socket should have been closed.
-    skipUids.resize(skipUids.size() - 1);
-    EXPECT_TRUE(mNetd->socketDestroy(uidRanges, skipUids).isOk());
-    checkSocketpairClosed(clientSocket, acceptedSocket);
-}
-
 TEST_F(NetdBinderTest, SocketDestroyLinkLocal) {
     // Add the same link-local address to two interfaces.
     const char* kLinkLocalAddress = "fe80::ace:d00d";
@@ -5671,6 +5628,8 @@ TEST_F(NetdBinderTest, BypassVpnWithNetId) {
         ScopedUidChange change(TEST_UID1);
         unique_fd sock(socket(AF_INET6, SOCK_DGRAM, 0));
         EXPECT_EQ(0, setNetworkForSocket(VPN_NETID, sock));
+        // 0x80000000 is NETID_USE_LOCAL_NAMESERVERS and should just be ignored
+        EXPECT_EQ(0, setNetworkForSocket(VPN_NETID | 0x80000000, sock));
         EXPECT_EQ(-EPERM, setNetworkForSocket(SYSTEM_DEFAULT_NETID, sock));
         EXPECT_EQ(-EPERM, setNetworkForSocket(OTHER_NETID, sock));
 

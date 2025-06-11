@@ -57,15 +57,6 @@ namespace {
 
 static const bool isUser = (android::base::GetProperty("ro.build.type", "") == "user");
 
-int getAdbPort() {
-    return android::base::GetIntProperty("service.adb.tcp.port", 0);
-}
-
-bool isAdbSocket(const inet_diag_msg *msg, int adbPort) {
-    return adbPort > 0 && msg->id.idiag_sport == htons(adbPort) &&
-        (msg->idiag_uid == AID_ROOT || msg->idiag_uid == AID_SHELL);
-}
-
 int checkError(int fd) {
     struct {
         nlmsghdr h;
@@ -425,36 +416,6 @@ int SockDiag::destroySockets(uint8_t proto, const uid_t uid, bool excludeLoopbac
 
     if (mSocketsDestroyed > 0) {
         ALOGI("Destroyed %d sockets for UID in %" PRId64 "us", mSocketsDestroyed, s.timeTakenUs());
-    }
-
-    return 0;
-}
-
-int SockDiag::destroySockets(const UidRanges& uidRanges, const std::set<uid_t>& skipUids,
-                             bool excludeLoopback) {
-    mSocketsDestroyed = 0;
-    Stopwatch s;
-
-    auto shouldDestroy = [&] (uint8_t, const inet_diag_msg *msg) {
-        return msg != nullptr &&
-               uidRanges.hasUid(msg->idiag_uid) &&
-               skipUids.find(msg->idiag_uid) == skipUids.end() &&
-               !(excludeLoopback && isLoopbackSocket(msg)) &&
-               !isAdbSocket(msg, getAdbPort());
-    };
-
-    iovec iov[] = {
-        { nullptr, 0 },
-    };
-
-    if (int ret = destroyLiveSockets(shouldDestroy, "UID", iov, ARRAY_SIZE(iov))) {
-        return ret;
-    }
-
-    if (mSocketsDestroyed > 0) {
-        ALOGI("Destroyed %d sockets for %s skip={%s} in %" PRId64 "us", mSocketsDestroyed,
-              uidRanges.toString().c_str(), android::base::Join(skipUids, " ").c_str(),
-              s.timeTakenUs());
     }
 
     return 0;

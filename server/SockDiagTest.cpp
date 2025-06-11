@@ -270,8 +270,6 @@ enum MicroBenchmarkTestType {
     ADDRESS,
     UID,
     UID_EXCLUDE_LOOPBACK,
-    UIDRANGE,
-    UIDRANGE_EXCLUDE_LOOPBACK,
     PERMISSION,
 };
 
@@ -281,8 +279,6 @@ const char *testTypeName(MicroBenchmarkTestType mode) {
         TO_STRING_TYPE(ADDRESS);
         TO_STRING_TYPE(UID);
         TO_STRING_TYPE(UID_EXCLUDE_LOOPBACK);
-        TO_STRING_TYPE(UIDRANGE);
-        TO_STRING_TYPE(UIDRANGE_EXCLUDE_LOOPBACK);
         TO_STRING_TYPE(PERMISSION);
     }
 #undef TO_STRING_TYPE
@@ -336,8 +332,6 @@ protected:
             return ADDRESS_SOCKETS;
         case UID:
         case UID_EXCLUDE_LOOPBACK:
-        case UIDRANGE:
-        case UIDRANGE_EXCLUDE_LOOPBACK:
             return UID_SOCKETS;
         case PERMISSION:
             return ARRAY_SIZE(permissionTestcases);
@@ -348,9 +342,7 @@ protected:
         MicroBenchmarkTestType mode = GetParam();
         switch (mode) {
         case UID:
-        case UID_EXCLUDE_LOOPBACK:
-        case UIDRANGE:
-        case UIDRANGE_EXCLUDE_LOOPBACK: {
+        case UID_EXCLUDE_LOOPBACK: {
             uid_t uid = START_UID + i;
             return fchown(s, uid, -1);
         }
@@ -382,16 +374,6 @@ protected:
                         strerror(-ret);
                 break;
             }
-            case UIDRANGE:
-            case UIDRANGE_EXCLUDE_LOOPBACK: {
-                bool excludeLoopback = (mode == UIDRANGE_EXCLUDE_LOOPBACK);
-                const char *uidRangeStrings[] = { "8005-8012", "8042", "8043", "8090-8099" };
-                std::set<uid_t> skipUids { 8007, 8043, 8098, 8099 };
-                UidRanges uidRanges;
-                uidRanges.parseFrom(ARRAY_SIZE(uidRangeStrings), (char **) uidRangeStrings);
-                ret = mSd.destroySockets(uidRanges, skipUids, excludeLoopback);
-                break;
-            }
             case PERMISSION: {
                 ret = mSd.destroySocketsLackingPermission(TEST_NETID, PERMISSION_NETWORK, false);
                 break;
@@ -407,20 +389,7 @@ protected:
                 return true;
             case UID:
                 return i == CLOSE_UID - START_UID;
-            case UIDRANGE: {
-                uid_t uid = i + START_UID;
-                // Skip UIDs in skipUids.
-                if (uid == 8007 || uid == 8043 || uid == 8098 || uid == 8099) {
-                    return false;
-                }
-                // Include UIDs in uidRanges.
-                if ((8005 <= uid && uid <= 8012) || uid == 8042 || (8090 <= uid && uid <= 8099)) {
-                    return true;
-                }
-                return false;
-            }
             case UID_EXCLUDE_LOOPBACK:
-            case UIDRANGE_EXCLUDE_LOOPBACK:
                 return false;
             case PERMISSION:
                 if (permissionTestcases[i].netId != 42) return false;
@@ -525,9 +494,7 @@ TEST_P(SockDiagMicroBenchmarkTest, TestMicroBenchmark) {
 constexpr int SockDiagMicroBenchmarkTest::CLOSE_UID;
 
 INSTANTIATE_TEST_CASE_P(Address, SockDiagMicroBenchmarkTest,
-                        testing::Values(ADDRESS, UID, UIDRANGE,
-                                        UID_EXCLUDE_LOOPBACK, UIDRANGE_EXCLUDE_LOOPBACK,
-                                        PERMISSION));
+                        testing::Values(ADDRESS, UID, UID_EXCLUDE_LOOPBACK, PERMISSION));
 
 }  // namespace net
 }  // namespace android

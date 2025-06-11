@@ -60,6 +60,7 @@ static constexpr char CONNMARK_MANGLE_OUTPUT[] = "connmark_mangle_OUTPUT";
 static const std::vector<const char*> FILTER_INPUT = {
         // Bandwidth should always be early in input chain, to make sure we
         // correctly count incoming traffic against data plan.
+        OEM_IPTABLES_FILTER_INPUT,
         BandwidthController::LOCAL_INPUT,
         FirewallController::LOCAL_INPUT,
 };
@@ -331,12 +332,14 @@ void Controllers::init() {
 
     if (int ret = RouteController::Init(NetworkController::LOCAL_NET_ID)) {
         gLog.error("Failed to initialize RouteController (%s)", strerror(-ret));
+        exit(2);
     }
     gLog.info("Initializing RouteController: %" PRId64 "us", s.getTimeAndResetUs());
 
     netdutils::Status xStatus = XfrmController::Init();
     if (!isOk(xStatus)) {
         gLog.error("Failed to initialize XfrmController (%s)", netdutils::toString(xStatus).c_str());
+        exit(3);
     };
     gLog.info("Initializing XfrmController: %" PRId64 "us", s.getTimeAndResetUs());
 }

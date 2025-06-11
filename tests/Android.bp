@@ -103,7 +103,6 @@ cc_test {
         "liblog",
         "libnetd_client",
         "libnetutils",
-        "libprocessgroup",
         "libssl",
         "libsysutils",
         "libutils",
